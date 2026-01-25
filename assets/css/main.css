@@ -1,0 +1,40 @@
+/* assets/css/main.css */
+:root{
+  --app-bg: #f6f7fb;
+  --card-radius: 16px;
+}
+
+body{
+  background: var(--app-bg);
+}
+
+.app-shell{
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-content{
+  flex: 1;
+  min-width: 0;
+}
+
+.page-wrap{
+  padding: 16px;
+}
+
+/* Avatar placeholder */
+.avatar-mini{
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #d9dbe3;
+  display: inline-block;
+}
+
+/* Topbar */
+.app-topbar{
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
