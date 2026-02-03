@@ -57,3 +57,121 @@ function parse_sale_qty(string $input): float
     if ($x === '') return 0;
     return (float)$x;
 }
+
+/**
+ * Get currency symbol from database settings
+ * @param mysqli|null $db Database connection
+ * @return string Currency symbol (default: $)
+ */
+function get_currency_symbol($db = null): string {
+    if (!$db) {
+        $db = $GLOBALS['db'] ?? null;
+    }
+    
+    if (!$db) {
+        return '$'; // Default fallback
+    }
+    
+    try {
+        $stmt = $db->prepare("SELECT value FROM settings WHERE `key` = 'currency_symbol' LIMIT 1");
+        if ($stmt) {
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $stmt->close();
+            
+            return $row['value'] ?? '$';
+        }
+    } catch (Exception $e) {
+        // Log error if needed
+    }
+    
+    return '$'; // Default fallback
+}
+
+/**
+ * Get currency code from database settings
+ * @param mysqli|null $db Database connection
+ * @return string Currency code (default: USD)
+ */
+function get_currency_code($db = null): string {
+    if (!$db) {
+        $db = $GLOBALS['db'] ?? null;
+    }
+    
+    if (!$db) {
+        return 'USD'; // Default fallback
+    }
+    
+    try {
+        $stmt = $db->prepare("SELECT value FROM settings WHERE `key` = 'currency_code' LIMIT 1");
+        if ($stmt) {
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $stmt->close();
+            
+            return $row['value'] ?? 'USD';
+        }
+    } catch (Exception $e) {
+        // Log error if needed
+    }
+    
+    return 'USD'; // Default fallback
+}
+
+/**
+ * Get decimal places from database settings
+ * @param mysqli|null $db Database connection
+ * @return int Number of decimal places (default: 2)
+ */
+function get_currency_decimals($db = null): int {
+    if (!$db) {
+        $db = $GLOBALS['db'] ?? null;
+    }
+    
+    if (!$db) {
+        return 2; // Default fallback
+    }
+    
+    try {
+        $stmt = $db->prepare("SELECT value FROM settings WHERE `key` = 'decimal_places' LIMIT 1");
+        if ($stmt) {
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $stmt->close();
+            
+            return (int)($row['value'] ?? 2);
+        }
+    } catch (Exception $e) {
+        // Log error if needed
+    }
+    
+    return 2; // Default fallback
+}
+
+/**
+ * Format currency amount with symbol and proper decimal places
+ * @param float $amount Amount to format
+ * @param mysqli|null $db Database connection
+ * @return string Formatted currency string
+ */
+function format_currency(float $amount, $db = null): string {
+    $symbol = get_currency_symbol($db);
+    $decimals = get_currency_decimals($db);
+    
+    return $symbol . number_format($amount, $decimals);
+}
+
+/**
+ * Format currency amount for display (without symbol)
+ * @param float $amount Amount to format
+ * @param mysqli|null $db Database connection
+ * @return string Formatted number string
+ */
+function format_currency_amount(float $amount, $db = null): string {
+    $decimals = get_currency_decimals($db);
+    
+    return number_format($amount, $decimals);
+}
