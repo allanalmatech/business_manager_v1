@@ -5,6 +5,10 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config/db.php';
 
 $dbCfg = require __DIR__ . '/../config/db.php';
+$appCfg = require __DIR__ . '/../config/app.php';
+
+// Define app version constant
+define('APP_VERSION', $appCfg['app_version']);
 
 $mysqli = new mysqli($dbCfg['host'], $dbCfg['username'], $dbCfg['password'], $dbCfg['database']);
 if ($mysqli->connect_error) {

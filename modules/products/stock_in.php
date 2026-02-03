@@ -36,7 +36,15 @@ require_once __DIR__ . '/../../templates/layout/header.php';
 
           <form id="stockInForm">
             <div class="row g-3">
-              <div class="col-12 col-md-6">
+              <div class="col-12 col-md-4">
+                <label class="form-label">Store/Location *</label>
+                <select class="form-select" id="locationId" required>
+                  <option value="">-- Select Location --</option>
+                </select>
+                <div class="form-text">Select the store location</div>
+              </div>
+
+              <div class="col-12 col-md-4">
                 <label class="form-label">Product *</label>
                 <select class="form-select" id="productId" required>
                   <option value="">-- Select Product --</option>
@@ -44,9 +52,20 @@ require_once __DIR__ . '/../../templates/layout/header.php';
                 <div class="form-text">Start typing to filter</div>
               </div>
 
-              <div class="col-12 col-md-3">
-                <label class="form-label">Quantity to Add *</label>
+              <div class="col-12 col-md-2">
+                <label class="form-label">Unit Type *</label>
+                <select class="form-select" id="unitType" required>
+                  <option value="units">Units</option>
+                  <option value="boxes">Boxes</option>
+                  <option value="pieces">Pieces</option>
+                </select>
+                <div class="form-text">Choose measurement unit</div>
+              </div>
+
+              <div class="col-12 col-md-2">
+                <label class="form-label">Quantity *</label>
                 <input class="form-control" type="number" step="0.01" min="0.01" id="qtyChange" required>
+                <div class="form-text" id="unitHint">Specify quantity</div>
               </div>
 
               <div class="col-12 col-md-3">

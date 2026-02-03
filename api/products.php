@@ -353,3 +353,64 @@ if ($action === 'stock_adjustment') {
         json_err($e->getMessage(), 400);
     }
 }
+
+// Stock In (Receive Stock)
+if ($action === 'stock_in_record') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') json_err('Method not allowed', 405);
+    $csrf = $_POST['csrf'] ?? '';
+    if (!hash_equals($_SESSION['csrf'] ?? '', (string)$csrf)) json_err('Invalid CSRF token', 403);
+    require_permission('products.update');
+
+    $productId = (int)($_POST['product_id'] ?? 0);
+    $locationId = (int)($_POST['location_id'] ?? 0);
+    $qtyChange = (float)($_POST['qty_change'] ?? 0);
+    $unitPrice = (float)($_POST['unit_price'] ?? 0);
+    $note = trim((string)($_POST['note'] ?? ''));
+
+    if ($productId <= 0) json_err('Invalid product');
+    if ($locationId <= 0) json_err('Invalid location');
+    if ($qtyChange <= 0) json_err('Quantity must be greater than 0');
+
+    $uid = (int)($_SESSION['user']['id'] ?? 0);
+
+    $db->begin_transaction();
+    try {
+        // Ensure stock row exists
+        $db->query("INSERT IGNORE INTO stock_by_location (product_id, location_id, qty_base, low_level_base)
+                    VALUES ($productId, $locationId, 0, 0)");
+
+        // Get current stock
+        $stmt = $db->prepare("SELECT qty_base FROM stock_by_location WHERE product_id=? AND location_id=? FOR UPDATE");
+        $stmt->bind_param("ii", $productId, $locationId);
+        $stmt->execute();
+        $before = (float)($stmt->get_result()->fetch_assoc()['qty_base'] ?? 0);
+        $stmt->close();
+
+        $after = $before + $qtyChange;
+
+        // Update stock
+        $stmt = $db->prepare("UPDATE stock_by_location SET qty_base=? WHERE product_id=? AND location_id=?");
+        $stmt->bind_param("dii", $after, $productId, $locationId);
+        $stmt->execute();
+        $stmt->close();
+
+        // Record movement
+        $stmt = $db->prepare("
+            INSERT INTO stock_movements
+            (product_id, from_location_id, to_location_id, movement_type, qty_change, qty_before, qty_after,
+             reference_type, reference_id, note, created_by)
+            VALUES (?, ?, ?, 'stock_in', ?, ?, ?, 'stock_in', NULL, ?, ?)
+        ");
+        $stmt->bind_param("iiddddsi", $productId, $locationId, $locationId, $qtyChange, $before, $after, $note, $uid);
+        $stmt->execute();
+        $stmt->close();
+
+        audit_log('products.stock_in', 'product', (string)$productId, "Stock in: $qtyChange units");
+        
+        $db->commit();
+        json_ok(['message' => 'Stock added successfully', 'new_qty' => $after]);
+    } catch (Throwable $e) {
+        $db->rollback();
+        json_err($e->getMessage(), 400);
+    }
+}

@@ -25,3 +25,14 @@ function require_role(string ...$roles): void
         exit;
     }
 }
+
+function require_admin_login(): void
+{
+    require_login();
+    $role = $_SESSION['user']['role'] ?? '';
+    if (!in_array($role, ['admin', 'super_admin'], true)) {
+        http_response_code(403);
+        echo "Forbidden";
+        exit;
+    }
+}

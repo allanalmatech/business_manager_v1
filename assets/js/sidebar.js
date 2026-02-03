@@ -7,6 +7,8 @@
     btnToggle.addEventListener("click", () => {
       document.body.classList.toggle("sidebar-collapsed");
       localStorage.setItem("sidebarCollapsed", document.body.classList.contains("sidebar-collapsed") ? "1" : "0");
+      // Reinitialize hover functionality after toggle
+      initHoverExpansion();
     });
   }
 
@@ -19,6 +21,52 @@
   // Restore desktop collapse state
   const saved = localStorage.getItem("sidebarCollapsed");
   if (saved === "1") document.body.classList.add("sidebar-collapsed");
+
+  // Initialize hover expansion functionality
+  function initHoverExpansion() {
+    // Remove existing event listeners to prevent duplicates
+    const navGroups = document.querySelectorAll('.app-sidebar .nav-link-group');
+    
+    navGroups.forEach(group => {
+      const submenu = group.querySelector('.nav-sub');
+      if (!submenu) return;
+
+      // Clone and replace to remove existing event listeners
+      const newGroup = group.cloneNode(true);
+      const newSubmenu = newGroup.querySelector('.nav-sub');
+      
+      let hoverTimeout;
+
+      newGroup.addEventListener('mouseenter', () => {
+        clearTimeout(hoverTimeout);
+        // Only show if sidebar is collapsed
+        if (document.body.classList.contains('sidebar-collapsed')) {
+          newSubmenu.style.display = 'block';
+        }
+      });
+
+      newGroup.addEventListener('mouseleave', () => {
+        // Hide with a small delay to allow moving to submenu
+        hoverTimeout = setTimeout(() => {
+          newSubmenu.style.display = 'none';
+        }, 100);
+      });
+
+      newSubmenu.addEventListener('mouseenter', () => {
+        clearTimeout(hoverTimeout);
+      });
+
+      newSubmenu.addEventListener('mouseleave', () => {
+        newSubmenu.style.display = 'none';
+      });
+
+      // Replace the original element
+      group.parentNode.replaceChild(newGroup, group);
+    });
+  }
+
+  // Initialize on page load
+  initHoverExpansion();
 
   // Close on overlay click (mobile)
   document.addEventListener("click", (e) => {
@@ -67,4 +115,7 @@
       if (btn) btn.setAttribute('aria-expanded', 'true');
     }
   }
+
+  // ===== Hover expansion for collapsed sidebar =====
+  // This is now handled by the initHoverExpansion function above
 })();
