@@ -36,7 +36,7 @@ if (!$sale) {
 }
 
 // Fetch sale items
-$sql = "SELECT si.*, p.name as current_product_name
+$sql = "SELECT si.*, p.name as current_product_name, p.cost_price as product_cost_price, si.external_cost, si.is_external
         FROM sale_items si
         LEFT JOIN products p ON si.product_id = p.id
         WHERE si.sale_id = ?
@@ -95,6 +95,11 @@ $stmt->close();
                             <h3><?= htmlspecialchars($sale['doc_type'] === 'receipt' ? 'RECEIPT' : strtoupper($sale['doc_type'])) ?></h3>
                             <h5>#<?= htmlspecialchars($sale['doc_no']) ?></h5>
                             <p class="mb-1"><?= date('F j, Y, g:i A', strtotime($sale['created_at'])) ?></p>
+                            <div class="mt-2">
+                                <span id="view-indicator" class="badge bg-info">
+                                    <i class="bi bi-eye"></i> <span id="view-count">Loading...</span>
+                                </span>
+                            </div>
                         </div>
 
                         <!-- Sale Info -->
@@ -124,21 +129,54 @@ $stmt->close();
                                     <th>Item</th>
                                     <th class="text-end">Qty</th>
                                     <th class="text-end">Price</th>
+                                    <th class="text-end">Cost</th>
                                     <th class="text-end">Discount</th>
                                     <th class="text-end">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($items as $item): ?>
+                                <?php 
+                                $total_cost = 0;
+                                foreach ($items as $item): 
+                                    // Determine the cost based on product type
+                                    if ($item['is_external'] == 1) {
+                                        // External product - use external_cost
+                                        $product_cost = $item['external_cost'] ?? 0;
+                                        $cost_source = "External";
+                                    } else {
+                                        // Regular product - use product cost_price
+                                        $product_cost = $item['product_cost_price'] ?? 0;
+                                        $cost_source = "Product";
+                                    }
+                                    
+                                    // Use the same quantity logic as profit report: qty_base if not zero, otherwise qty_input
+                                    $quantity = ($item['qty_base'] != 0) ? $item['qty_base'] : $item['qty_input'];
+                                    $item_cost = $quantity * $product_cost;
+                                    $total_cost += $item_cost;
+                                ?>
                                 <tr>
                                     <td>
                                         <?= htmlspecialchars($item['name_snapshot']) ?>
                                         <?php if (!empty($item['sku_snapshot'])): ?>
                                             <br><small class="text-muted">SKU: <?= htmlspecialchars($item['sku_snapshot']) ?></small>
                                         <?php endif; ?>
+                                        <?php if ($item['is_external'] == 1): ?>
+                                            <br><small class="text-info">📦 External Product</small>
+                                        <?php endif; ?>
+                                        <?php if ($product_cost == 0): ?>
+                                            <br><small class="text-warning">⚠️ No cost price set (<?= $cost_source ?>)</small>
+                                        <?php endif; ?>
                                     </td>
-                                    <td class="text-end"><?= number_format($item['qty_base']) ?></td>
+                                    <td class="text-end"><?= number_format($quantity) ?></td>
                                     <td class="text-end"><?= number_format($item['unit_price'], 2) ?></td>
+                                    <td class="text-end">
+                                        <?php if ($product_cost == 0): ?>
+                                            <span class="text-danger"><?= number_format($product_cost, 2) ?></span>
+                                        <?php else: ?>
+                                            <?= number_format($product_cost, 2) ?>
+                                        <?php endif; ?>
+                                        <br><small class="text-muted"><?= $cost_source ?></small>
+                                    </td>
                                     <td class="text-end"><?= number_format($item['discount_amount'], 2) ?></td>
                                     <td class="text-end"><?= number_format($item['line_total'], 2) ?></td>
                                 </tr>
@@ -163,6 +201,29 @@ $stmt->close();
                                 </tr>
                             </tfoot>
                         </table>
+
+                        <!-- Profit Summary -->
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <h6 class="mb-3">Profit Analysis</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <small class="text-muted">Total Revenue</small>
+                                    <div class="fw-bold text-success"><?= number_format($sale['grand_total'], 2) ?></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted">Cost of Goods (COGS)</small>
+                                    <div class="fw-bold text-danger"><?= number_format($total_cost, 2) ?></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted">Gross Profit</small>
+                                    <div class="fw-bold text-primary"><?= number_format($sale['grand_total'] - $total_cost, 2) ?></div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">Profit Margin: </small>
+                                <span class="fw-bold"><?= number_format((($sale['grand_total'] - $total_cost) / $sale['grand_total']) * 100, 1) ?>%</span>
+                            </div>
+                        </div>
 
                         <!-- Payments -->
                         <h6>Payments</h6>
@@ -240,6 +301,93 @@ $stmt->close();
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     
     <script>
+    // Track view and update display
+    document.addEventListener('DOMContentLoaded', function() {
+        const saleId = <?= $sale_id ?>;
+        const viewedSales = JSON.parse(localStorage.getItem('viewedSales') || '{}');
+        
+        // Get current view data or initialize
+        let viewData = viewedSales[saleId];
+        if (!viewData) {
+            viewData = {
+                count: 0,
+                firstViewed: new Date().toISOString(),
+                lastViewed: new Date().toISOString()
+            };
+        } else {
+            // Parse existing data
+            if (typeof viewData === 'string') {
+                // Old format - just a timestamp
+                viewData = {
+                    count: 1,
+                    firstViewed: viewData,
+                    lastViewed: new Date().toISOString()
+                };
+            } else {
+                // New format - increment count and update last viewed
+                viewData.count = (viewData.count || 1) + 1;
+                viewData.lastViewed = new Date().toISOString();
+            }
+        }
+        
+        // Save updated data
+        viewedSales[saleId] = viewData;
+        localStorage.setItem('viewedSales', JSON.stringify(viewedSales));
+        
+        // Update display
+        updateViewDisplay(viewData);
+        
+        // Notify parent window (if opened from sales report)
+        if (window.opener) {
+            try {
+                window.opener.markAsViewed(saleId);
+            } catch (e) {
+                // Cross-origin or other security restrictions
+                console.log('Could not notify parent window');
+            }
+        }
+    });
+    
+    function updateViewDisplay(viewData) {
+        const viewCount = document.getElementById('view-count');
+        const viewIndicator = document.getElementById('view-indicator');
+        
+        if (viewCount && viewIndicator) {
+            const count = viewData.count || 1;
+            const lastViewed = new Date(viewData.lastViewed);
+            const timeAgo = getTimeAgo(lastViewed);
+            
+            if (count === 1) {
+                viewCount.textContent = 'First view';
+                viewIndicator.className = 'badge bg-primary';
+            } else {
+                viewCount.textContent = `Viewed ${count} times • ${timeAgo}`;
+                viewIndicator.className = 'badge bg-success';
+            }
+        }
+    }
+    
+    function getTimeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        
+        let interval = seconds / 31536000;
+        if (interval > 1) return Math.floor(interval) + " year" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+        
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + " month" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+        
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + " day" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+        
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + " hour" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+        
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + " minute" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+        
+        return "Just now";
+    }
+    
     function editSale() {
         // Store sale data in sessionStorage for the POS form to retrieve
         const editData = {
