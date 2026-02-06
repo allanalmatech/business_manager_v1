@@ -1,5 +1,5 @@
-/* assets/js/pos.js (FULL - fixed preview + finalize + modal IDs fallback)
- * Business Manager V1 - POS (Core JS + Fetch)
+/* assets/js/pos.js
+ * Business Manager V1 - POS Machine Optimized
  */
 
 (() => {
@@ -41,6 +41,7 @@
 
   const elCartPanel = $("cartPanel");
   const elCartEmptyRow = $("cartEmptyRow");
+  const elCartCount = $("cartCount");
 
   const elDocType = $("doc_type");
   const elLoc = $("selling_location_id");
@@ -55,18 +56,14 @@
   const elTSubtotal = $("t_subtotal");
   const elTDiscount = $("t_discount");
   const elTGrand = $("t_grand");
-  const elTPaid = $("t_paid");
-  const elTBalance = $("t_balance");
+  const elTBalanceDisplay = $("t_balance_display");
 
   const payMethod = $("pay_method");
-  const payProvider = $("pay_provider");
   const payAmount = $("pay_amount");
-  const payRef = $("pay_reference");
   const payBody = $("paymentsBody");
   const payEmptyRow = $("paymentsEmptyRow");
   const btnAddPaymentRow = $("btnAddPaymentRow");
-
-  const btnAddExternal = $("btnAddExternal");
+  const btnToggleFullscreen = $("btnToggleFullscreen");
 
   // ---------- Network ----------
   async function apiPost(action, payload) {
@@ -134,8 +131,8 @@
     if (elTSubtotal) elTSubtotal.textContent = fmt(t.subtotal);
     if (elTDiscount) elTDiscount.textContent = fmt(t.discount);
     if (elTGrand) elTGrand.textContent = fmt(t.grand);
-    if (elTPaid) elTPaid.textContent = fmt(t.paid);
-    if (elTBalance) elTBalance.textContent = fmt(t.balance);
+    if (elTBalanceDisplay) elTBalanceDisplay.textContent = `Balance: ${fmt(t.balance)}`;
+    if (elCartCount) elCartCount.textContent = `${cart.length} item${cart.length === 1 ? '' : 's'}`;
 
     if (elBtnConfirm) elBtnConfirm.disabled = cart.length === 0;
   }
@@ -170,49 +167,27 @@
       const item = document.createElement("div");
       item.className = "pos-cart-item";
 
-      const thumb = it.thumbnail ? `<img src="${esc(toImg(it.thumbnail))}" alt="">` : "";
-
-      const priceDisabled = perms.editPrice ? "" : "disabled";
-      const discDisabled = perms.discount ? "" : "disabled";
+      const thumbUrl = toImg(it.thumbnail);
+      const thumb = thumbUrl ? `<img src="${esc(thumbUrl)}" alt="">` : "";
 
       item.innerHTML = `
         <div class="pos-thumb">${thumb}</div>
-
-        <div>
-          <div class="pos-ci-title">${esc(it.name)}</div>
-          <div class="pos-ci-sub">
-            ${it.sku ? `SKU: ${esc(it.sku)} • ` : ""}
-            ${esc(it.stock_hint || "")}
-          </div>
-
-          <div class="pos-ci-controls">
-            <div>
-              <label>Qty</label>
-              <input class="form-control form-control-sm text-end pos-qty"
-                     data-idx="${idx}" value="${esc(it.qty)}" inputmode="decimal">
-            </div>
-
-            <div>
-              <label>Price</label>
-              <input class="form-control form-control-sm text-end pos-price"
-                     data-idx="${idx}" value="${esc(it.unit_price)}" inputmode="decimal" ${priceDisabled}>
-              ${it.min_price ? `<div class="small text-muted">Min: ${fmt(it.min_price)}</div>` : ``}
-            </div>
-
-            <div>
-              <label>Discount</label>
-              <input class="form-control form-control-sm text-end pos-discount"
-                     data-idx="${idx}" value="${esc(it.discount)}" inputmode="decimal" ${discDisabled}>
-            </div>
-          </div>
-
-          <div class="pos-ci-footer">
-            <div class="pos-ci-total">${fmt(lineTotal(it))}</div>
-
-            <button class="btn btn-outline-danger btn-sm pos-ci-remove pos-remove"
-                    data-idx="${idx}" type="button" title="Remove">
-              <i class="bi bi-trash"></i>
+        <div class="flex-grow-1">
+          <div class="d-flex justify-content-between">
+            <div class="pos-ci-title">${esc(it.name)}</div>
+            <button class="btn btn-link text-danger p-0 pos-remove" data-idx="${idx}">
+              <i class="bi bi-x-circle-fill"></i>
             </button>
+          </div>
+          <div class="pos-ci-sub">${esc(it.sku || "")} • ${fmt(it.unit_price)}</div>
+          
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <div class="pos-qty-group">
+              <button class="pos-qty-btn minus" data-idx="${idx}">-</button>
+              <input class="pos-qty-input pos-qty" data-idx="${idx}" value="${esc(it.qty)}" readonly>
+              <button class="pos-qty-btn plus" data-idx="${idx}">+</button>
+            </div>
+            <div class="pos-ci-total fw-bold">${fmt(lineTotal(it))}</div>
           </div>
         </div>
       `;
@@ -251,7 +226,7 @@
     renderCart();
   }
 
-  // ---------- Search ----------
+  // ---------- Search & Quick Items ----------
   function showResults() {
     if (elResultsWrap) elResultsWrap.classList.remove("d-none");
   }
@@ -260,165 +235,132 @@
     if (elResults) elResults.innerHTML = "";
   }
 
-  function renderSearchResults(items) {
-    if (!elResults) return;
+  async function loadQuickItems(cat = "") {
+    const grid = $("quickItems");
+    if (!grid) return;
 
-    elResults.innerHTML = "";
-    if (!items || items.length === 0) {
-      elResults.innerHTML = `<div class="text-muted small px-2 py-2">No results found.</div>`;
-      showResults();
-      return;
-    }
-
-    items.forEach((p) => {
-      const thumbUrl = p.thumbnail ? toImg(p.thumbnail) : "";
-      const thumb = thumbUrl
-        ? `<div class="pos-s-thumb"><img src="${esc(thumbUrl)}" alt=""></div>`
-        : `<div class="pos-s-thumb ph"></div>`;
-
-      const stock = p.stock_display || "";
-      const priceRetail = fmt(p.retail_price || 0);
-      const priceWholesale = fmt(p.wholesale_price || 0);
-
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "list-group-item list-group-item-action";
-      btn.innerHTML = `
-        <div class="d-flex align-items-center gap-2">
-          ${thumb}
-          <div class="minw-0 flex-grow-1">
-            <div class="fw-semibold text-truncate">${esc(p.name)}</div>
-            <div class="text-muted small text-truncate">${esc(p.sku || "")}</div>
-            ${stock ? `<div class="small text-muted">${esc(stock)}</div>` : ``}
-          </div>
-          <div class="text-end small">
-            <div><span class="text-muted">R:</span> <span class="fw-semibold">${priceRetail}</span></div>
-            <div><span class="text-muted">W:</span> <span class="fw-semibold">${priceWholesale}</span></div>
-          </div>
-        </div>
-      `;
-
-      btn.addEventListener("click", () => {
-        const mode = getPricingMode();
-        const unitPrice = mode === "wholesale" ? num(p.wholesale_price) : num(p.retail_price);
-
-        addToCart({
-          product_id: p.id,
-          name: p.name,
-          sku: p.sku,
-          thumbnail: p.thumbnail,
-          qty: 1,
-          unit_price: unitPrice,
-          min_price: num(p.wholesale_price || 0),
-          discount: 0,
-          is_external: false,
-          stock_hint: p.stock_display || "",
-        });
-
-        if (elSearchInput) {
-          elSearchInput.value = "";
-          elSearchInput.focus();
-        }
-        hideResults();
-      });
-
-      elResults.appendChild(btn);
-    });
-
-    showResults();
-  }
-
-  const doSearch = debounce(async () => {
-    const q = (elSearchInput?.value || "").trim();
-    if (!q) {
-      hideResults();
-      return;
-    }
-
-    const token = ++lastSearchToken;
-    try {
-      const data = await apiPost("search_products", {
-        csrf,
-        q,
-        selling_location_id: elLoc?.value || "",
-        pricing_mode: getPricingMode(),
-      });
-
-      if (token !== lastSearchToken) return;
-      renderSearchResults(data.results || []);
-    } catch (e) {
-      hideResults();
-      console.error(e);
-    }
-  }, 250);
-
-  // ---------- Quick Items ----------
-  async function loadQuickItems(categoryId = "") {
-    const host = $("quickItems");
-    if (!host) return;
-
-    host.innerHTML = `<div class="text-muted small">Loading…</div>`;
+    grid.innerHTML = `<div class="p-4 text-center w-100 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Loading...</div>`;
 
     try {
       const data = await apiPost("quick_items", {
         csrf,
-        category_id: categoryId,
         selling_location_id: elLoc?.value || "",
-        pricing_mode: getPricingMode(),
+        category: cat
       });
 
-      const items = data.items || [];
-      if (!items.length) {
-        host.innerHTML = `<div class="text-muted small">No items found.</div>`;
+      grid.innerHTML = "";
+      if (!data.items || !data.items.length) {
+        grid.innerHTML = `<div class="p-4 text-center w-100 text-muted">No items found in this category.</div>`;
         return;
       }
 
-      host.innerHTML = "";
-      items.forEach((p) => {
-        const mode = getPricingMode();
-        const unitPrice = mode === "wholesale" ? num(p.wholesale_price) : num(p.retail_price);
-
-        const tile = document.createElement("button");
-        tile.type = "button";
-        tile.className = "pos-quick-tile";
-
-        const thumbUrl = p.thumbnail ? toImg(p.thumbnail) : "";
-        const thumb = thumbUrl ? `<img src="${esc(thumbUrl)}" alt="">` : ``;
+      data.items.forEach((p) => {
+        const tile = document.createElement("div");
+        tile.className = "pos-quick-tile touch-tile";
+        
+        const thumbUrl = toImg(p.thumbnail);
+        const thumb = thumbUrl 
+          ? `<div class="pos-quick-thumb"><img src="${esc(thumbUrl)}" alt=""></div>`
+          : `<div class="pos-quick-thumb d-flex align-items-center justify-content-center bg-light text-muted"><i class="bi bi-image" style="font-size: 2rem;"></i></div>`;
 
         tile.innerHTML = `
-          <div class="pos-quick-thumb">${thumb}</div>
-          <div class="pos-quick-name">${esc(p.name)}</div>
-          <div class="pos-quick-price">${fmt(unitPrice)}</div>
+          ${thumb}
+          <div class="pos-quick-info">
+            <div class="pos-quick-name">${esc(p.name)}</div>
+            <div class="pos-quick-price">${fmt(getPricingMode() === 'wholesale' ? p.wholesale_price : p.retail_price)}</div>
+          </div>
         `;
 
         tile.addEventListener("click", () => {
+          const mode = getPricingMode();
           addToCart({
             product_id: p.id,
             name: p.name,
             sku: p.sku,
             thumbnail: p.thumbnail,
             qty: 1,
-            unit_price: unitPrice,
+            unit_price: mode === "wholesale" ? num(p.wholesale_price) : num(p.retail_price),
             min_price: num(p.wholesale_price || 0),
             discount: 0,
-            is_external: false,
-            stock_hint: p.stock_display || "",
+            stock_hint: p.stock_display || ""
           });
         });
 
-        host.appendChild(tile);
+        grid.appendChild(tile);
       });
     } catch (e) {
-      host.innerHTML = `<div class="text-danger small">${esc(e.message || "Failed to load quick items.")}</div>`;
-      console.error(e);
+      grid.innerHTML = `<div class="alert alert-danger m-3">Failed to load items.</div>`;
     }
   }
+
+  const doSearch = debounce(async () => {
+    const q = (elSearchInput?.value || "").trim();
+    if (q.length < 2) {
+      hideResults();
+      return;
+    }
+
+    const myToken = ++lastSearchToken;
+    try {
+      const data = await apiPost("search_products", {
+        csrf,
+        q,
+        selling_location_id: elLoc?.value || "",
+      });
+      if (myToken !== lastSearchToken) return;
+
+      if (!elResults) return;
+      elResults.innerHTML = "";
+      
+      if (!data.results || !data.results.length) {
+        elResults.innerHTML = `<div class="p-3 text-center text-muted">No results found</div>`;
+      } else {
+        data.results.forEach(p => {
+          const item = document.createElement("button");
+          item.className = "list-group-item list-group-item-action d-flex align-items-center gap-3";
+          const thumbUrl = toImg(p.thumbnail);
+          item.innerHTML = `
+            <div style="width:40px;height:40px;background:#eee;border-radius:8px;overflow:hidden flex-shrink-0;">
+              ${thumbUrl ? `<img src="${esc(thumbUrl)}" style="width:100%;height:100%;object-fit:cover;">` : ''}
+            </div>
+            <div class="flex-grow-1 minw-0">
+              <div class="fw-bold text-truncate">${esc(p.name)}</div>
+              <div class="small text-muted">${esc(p.sku)}</div>
+            </div>
+            <div class="text-end">
+              <div class="fw-bold">${fmt(getPricingMode() === 'wholesale' ? p.wholesale_price : p.retail_price)}</div>
+              <div class="small text-success">${esc(p.stock_display)}</div>
+            </div>
+          `;
+          item.addEventListener("click", () => {
+            const mode = getPricingMode();
+            addToCart({
+              product_id: p.id,
+              name: p.name,
+              sku: p.sku,
+              thumbnail: p.thumbnail,
+              qty: 1,
+              unit_price: mode === "wholesale" ? num(p.wholesale_price) : num(p.retail_price),
+              min_price: num(p.wholesale_price || 0),
+              discount: 0,
+              stock_hint: p.stock_display || ""
+            });
+            elSearchInput.value = "";
+            hideResults();
+          });
+          elResults.appendChild(item);
+        });
+      }
+      showResults();
+    } catch (e) {
+      console.error(e);
+    }
+  }, 300);
 
   // ---------- Payments ----------
   function renderPayments() {
     if (!payBody) return;
-
-    payBody.querySelectorAll("tr.pos-pay-row").forEach((tr) => tr.remove());
+    payBody.querySelectorAll("tr:not(#paymentsEmptyRow)").forEach(x => x.remove());
 
     if (!payments.length) {
       if (payEmptyRow) payEmptyRow.style.display = "";
@@ -429,16 +371,11 @@
 
     payments.forEach((p, idx) => {
       const tr = document.createElement("tr");
-      tr.className = "pos-pay-row";
       tr.innerHTML = `
-        <td>${esc(p.method)}</td>
-        <td>${esc(p.provider || "")}</td>
-        <td class="text-muted">${esc(p.reference || "")}</td>
-        <td class="text-end fw-semibold">${fmt(p.amount)}</td>
-        <td class="text-end">
-          <button type="button" class="btn btn-sm btn-outline-danger" data-pay-del="${idx}">
-            <i class="bi bi-trash"></i>
-          </button>
+        <td class="py-1"><span class="badge bg-light text-dark border">${esc(p.method)}</span></td>
+        <td class="py-1 text-end fw-bold">${fmt(p.amount)}</td>
+        <td class="py-1 text-end" style="width:40px;">
+          <button class="btn btn-sm text-danger p-0" data-pay-del="${idx}"><i class="bi bi-trash"></i></button>
         </td>
       `;
       payBody.appendChild(tr);
@@ -448,51 +385,43 @@
   }
 
   function addPaymentFromInputs() {
-    const method = (payMethod?.value || "").trim();
-    const provider = (payProvider?.value || "").trim();
-    const amount = num(payAmount?.value || 0);
-    const reference = (payRef?.value || "").trim();
+    const amt = num(payAmount?.value);
+    if (amt <= 0) return;
 
-    if (amount <= 0) return alert("Enter a valid payment amount.");
-    if (method === "bank" && !reference) return alert("Bank payments require a reference.");
-
-    payments.push({ method, provider, amount, reference });
+    payments.push({
+      method: payMethod?.value || "cash",
+      provider: "",
+      reference: "",
+      amount: amt
+    });
 
     if (payAmount) payAmount.value = "";
-    if (payRef) payRef.value = "";
-
     renderPayments();
   }
 
-  // ---------- Preview (FIXED) ----------
+  // ---------- Fullscreen ----------
+  function toggleFullscreen() {
+    document.body.classList.toggle("pos-fullscreen");
+    const icon = btnToggleFullscreen.querySelector("i");
+    if (document.body.classList.contains("pos-fullscreen")) {
+      icon.className = "bi bi-fullscreen-exit";
+    } else {
+      icon.className = "bi bi-arrows-fullscreen";
+    }
+  }
+
+  // ---------- Preview & Confirm ----------
   async function openPreview() {
-    if (!cart.length) return alert("Add items to cart first.");
-
-    // Check debt permissions and payment balance
-    const totals = calcTotals();
-    if (totals.balance > 0 && !CFG.perms.debt) {
-      alert(`Insufficient payment! Balance: ${fmt(totals.balance)}\n\nYou don't have permission to allow debt. Please add more payment or reduce the sale amount.`);
-      return;
-    }
-
-    const modalEl = document.getElementById("previewModal");
-    const bodyHost = document.getElementById("previewModalBody") || document.getElementById("previewContent");
-
-    if (!modalEl || !bodyHost) {
-      // If modal markup isn't on the page, fallback to direct confirm
-      await confirmSale();
-      return;
-    }
-
-    bodyHost.innerHTML =
-      '<div class="text-center py-4">' +
-      '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>' +
-      '<div class="mt-2">Loading preview...</div>' +
-      "</div>";
-
-    // show modal (safe instance)
-    const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    if (!cart.length) return alert("Cart is empty");
+    
+    const modalEl = $("previewModal");
+    if (!modalEl) return;
+    
+    const bsModal = new bootstrap.Modal(modalEl);
     bsModal.show();
+
+    const bodyHost = $("previewModalBody");
+    const totals = calcTotals();
 
     const payload = {
       csrf,
@@ -501,7 +430,7 @@
       selling_location_id: elLoc?.value || "",
       customer_id: elCustomer?.value || "",
       notes: (elNotes?.value || "").trim(),
-      items: cart.map((it) => ({
+      items: cart.map(it => ({
         product_id: it.product_id,
         name: it.name,
         sku: it.sku,
@@ -510,45 +439,32 @@
         unit_price: num(it.unit_price),
         discount: num(it.discount),
         is_external: !!it.is_external,
-        ext_key: it.is_external ? it._key : null,
-        meta: it.meta || {},
+        meta: it.meta || {}
       })),
-      payments: payments.map((p) => ({
+      payments: payments.map(p => ({
         method: p.method,
         provider: p.provider,
         reference: p.reference,
-        amount: num(p.amount),
+        amount: num(p.amount)
       })),
-      totals: totals, // Include totals for change calculation
+      totals: totals
     };
 
     try {
-      const url = `${CFG.baseUrl}/modules/pos/pos_preview.php`;
-
-      const res = await fetch(url, {
+      const res = await fetch(`${CFG.baseUrl}/modules/pos/pos_preview.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Requested-With": "XMLHttpRequest" },
         credentials: "same-origin",
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
-
       const html = await res.text();
-
-      if (!res.ok) {
-        bodyHost.innerHTML = html || `<div class="alert alert-danger">Preview failed (${res.status})</div>`;
-        return;
-      }
-
       bodyHost.innerHTML = html;
     } catch (e) {
-      console.error(e);
-      bodyHost.innerHTML = `<div class="alert alert-danger m-0">Failed to load preview: ${esc(e.message || e)}</div>`;
+      bodyHost.innerHTML = `<div class="alert alert-danger">Failed to load preview</div>`;
     }
   }
 
   async function confirmSale() {
-    if (!cart.length) return alert("Add items to cart first.");
-
     const payload = {
       csrf,
       doc_type: elDocType?.value || "receipt",
@@ -556,183 +472,131 @@
       selling_location_id: elLoc?.value || "",
       customer_id: elCustomer?.value || "",
       notes: (elNotes?.value || "").trim(),
-      items: cart.map((it) => ({
+      items: cart.map(it => ({
         product_id: it.product_id,
         name: it.name,
         sku: it.sku,
-        thumbnail: it.thumbnail,
         qty: it.qty,
         unit_price: it.unit_price,
         discount: it.discount,
-        is_external: !!it.is_external,
-        ext_key: it.is_external ? it._key : null,
-        meta: it.meta || {},
+        is_external: !!it.is_external
       })),
-      payments: payments.map((p) => ({
+      payments: payments.map(p => ({
         method: p.method,
         provider: p.provider,
         amount: p.amount,
-        reference: p.reference,
-      })),
+        reference: p.reference
+      }))
     };
 
     const data = await apiPost("confirm_sale", payload);
-
-    // Close modal if it's open
-    const modalEl = document.getElementById("previewModal");
-    if (modalEl) {
-      const bsModal = bootstrap.Modal.getInstance(modalEl);
-      if (bsModal) bsModal.hide();
-    }
-
-    // Open print window
-    const printUrl =
-      data.print_url ||
-      `${CFG.baseUrl}/modules/pos/pos_print.php?id=${encodeURIComponent(data.sale_id || "")}`;
+    const printUrl = data.print_url || `${CFG.baseUrl}/modules/pos/pos_print.php?id=${data.sale_id}`;
     window.open(printUrl, "_blank");
-
-    // Reset and go back to POS
     newSale();
   }
 
   function newSale() {
     cart = [];
     payments = [];
-    hideResults();
     renderCart();
     renderPayments();
-    if (elNotes) elNotes.value = "";
-    if (elCustomer) elCustomer.value = "";
     if (elSearchInput) elSearchInput.value = "";
+    if (payAmount) payAmount.value = "";
   }
 
   // ---------- Events ----------
   function wireEvents() {
     elSearchInput?.addEventListener("input", doSearch);
-
-    elSearchInput?.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") hideResults();
-    });
-
     elHideResults?.addEventListener("click", hideResults);
-
-    elLoc?.addEventListener("change", () => {
-      loadQuickItems();
-      if (!(elResultsWrap?.classList.contains("d-none"))) doSearch();
+    elLoc?.addEventListener("change", () => loadQuickItems());
+    
+    document.querySelectorAll('input[name="pricing_mode"]').forEach(r => {
+      r.addEventListener("change", () => loadQuickItems());
     });
 
-    document.querySelectorAll('input[name="pricing_mode"]').forEach((r) => {
-      r.addEventListener("change", () => {
-        loadQuickItems();
-        if (!(elResultsWrap?.classList.contains("d-none"))) doSearch();
-      });
-    });
+    btnToggleFullscreen?.addEventListener("click", toggleFullscreen);
 
+    // Cart Events
     elCartPanel?.addEventListener("click", (e) => {
-      const btnDel = e.target.closest?.(".pos-remove");
-      if (btnDel) {
-        const idx = parseInt(btnDel.getAttribute("data-idx"), 10);
-        if (!Number.isFinite(idx)) return;
+      const btnRemove = e.target.closest(".pos-remove");
+      const btnPlus = e.target.closest(".plus");
+      const btnMinus = e.target.closest(".minus");
+
+      if (btnRemove) {
+        const idx = parseInt(btnRemove.dataset.idx);
         cart.splice(idx, 1);
         renderCart();
-      }
-    });
-
-    elCartPanel?.addEventListener("input", (e) => {
-      const qtyEl = e.target.closest?.(".pos-qty");
-      const priceEl = e.target.closest?.(".pos-price");
-      const discEl = e.target.closest?.(".pos-discount");
-
-      if (qtyEl) {
-        const idx = parseInt(qtyEl.getAttribute("data-idx"), 10);
-        if (!Number.isFinite(idx) || !cart[idx]) return;
-        cart[idx].qty = Math.max(1, num(qtyEl.value || 1));
+      } else if (btnPlus) {
+        const idx = parseInt(btnPlus.dataset.idx);
+        cart[idx].qty++;
         renderCart();
-        return;
-      }
-
-      if (priceEl) {
-        const idx = parseInt(priceEl.getAttribute("data-idx"), 10);
-        if (!Number.isFinite(idx) || !cart[idx]) return;
-        let v = num(priceEl.value);
-        const minP = cart[idx].min_price ? num(cart[idx].min_price) : 0;
-        if (minP > 0 && v < minP) v = minP;
-        cart[idx].unit_price = v;
-        renderCart();
-        return;
-      }
-
-      if (discEl) {
-        const idx = parseInt(discEl.getAttribute("data-idx"), 10);
-        if (!Number.isFinite(idx) || !cart[idx]) return;
-        const gross = num(cart[idx].qty) * num(cart[idx].unit_price);
-        let d = num(discEl.value);
-        d = Math.max(0, Math.min(d, gross));
-        cart[idx].discount = d;
-        renderCart();
-      }
-    });
-
-    btnAddPaymentRow?.addEventListener("click", addPaymentFromInputs);
-
-    payBody?.addEventListener("click", (e) => {
-      const btn = e.target.closest?.("[data-pay-del]");
-      if (!btn) return;
-      const idx = parseInt(btn.getAttribute("data-pay-del"), 10);
-      if (!Number.isFinite(idx)) return;
-      payments.splice(idx, 1);
-      renderPayments();
-    });
-
-    // Confirm button opens preview
-    elBtnConfirm?.addEventListener("click", openPreview);
-
-    // Finalize from modal (id MUST be btnConfirmFromPreview)
-    document.addEventListener("click", async (e) => {
-      const btn = e.target?.closest?.("#btnConfirmFromPreview");
-      if (!btn) return;
-
-      const originalHtml = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
-
-      try {
-        await confirmSale(); // closes modal on success + opens print + resets
-      } catch (err) {
-        console.error(err);
-        btn.disabled = false;
-        btn.innerHTML = originalHtml;
-
-        const bodyHost = document.getElementById("previewModalBody") || document.getElementById("previewContent");
-        if (bodyHost) {
-          bodyHost.innerHTML = `
-            <div class="alert alert-danger">
-              <div class="fw-semibold mb-1">Sale Error</div>
-              <div class="small">${esc(err.message || "Failed to finalize sale")}</div>
-            </div>
-          `;
-        } else {
-          alert(err.message || "Failed to finalize sale");
+      } else if (btnMinus) {
+        const idx = parseInt(btnMinus.dataset.idx);
+        if (cart[idx].qty > 1) {
+          cart[idx].qty--;
+          renderCart();
         }
       }
     });
 
-    // Clear modal body when hidden
-    const modalEl = document.getElementById("previewModal");
-    if (modalEl) {
-      modalEl.addEventListener("hidden.bs.modal", () => {
-        const bodyHost = document.getElementById("previewModalBody") || document.getElementById("previewContent");
-        if (bodyHost) bodyHost.innerHTML = "";
+    // Payment Shortcuts
+    document.querySelectorAll(".btn-shortcut").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const amtType = btn.dataset.amt;
+        const totals = calcTotals();
+        
+        if (amtType === "exact") {
+          payAmount.value = totals.balance > 0 ? totals.balance.toFixed(2) : "";
+        } else if (!isNaN(amtType)) {
+          const current = num(payAmount.value);
+          payAmount.value = (current + num(amtType)).toFixed(2);
+        }
       });
-    }
-
-    elNewSale?.addEventListener("click", () => {
-      if ((cart.length || payments.length) && !confirm("Start a new sale? Current cart will be cleared.")) return;
-      newSale();
     });
 
-    btnAddExternal?.addEventListener("click", () => {
-      alert("External modal not included here. If you want it, tell me and I’ll add the full Bootstrap modal markup too.");
+    btnAddPaymentRow?.addEventListener("click", addPaymentFromInputs);
+    
+    payBody?.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-pay-del]");
+      if (btn) {
+        const idx = parseInt(btn.dataset.payDel);
+        payments.splice(idx, 1);
+        renderPayments();
+      }
+    });
+
+    // Category Tabs
+    document.querySelectorAll(".pos-tab-modern").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".pos-tab-modern").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        loadQuickItems(tab.dataset.cat);
+      });
+    });
+
+    elBtnConfirm?.addEventListener("click", openPreview);
+
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest("#btnConfirmFromPreview");
+      if (!btn) return;
+
+      btn.disabled = true;
+      const oldText = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+      try {
+        await confirmSale();
+        const modalEl = $("previewModal");
+        if (modalEl) bootstrap.Modal.getInstance(modalEl).hide();
+      } catch (err) {
+        alert(err.message || "Failed to finalize sale");
+        btn.disabled = false;
+        btn.innerHTML = oldText;
+      }
+    });
+
+    elNewSale?.addEventListener("click", () => {
+      if (cart.length && confirm("Clear current sale?")) newSale();
     });
   }
 

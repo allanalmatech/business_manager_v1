@@ -8,12 +8,12 @@ $BASE_URL = $GLOBALS['BASE_URL'] ?? '';
 
     <!-- Mobile sidebar toggle -->
     <button class="btn btn-outline-secondary btn-sm d-lg-none" id="btnSidebarOpen" type="button">
-      ☰
+      <i class="bi bi-list"></i>
     </button>
 
     <!-- Desktop collapse toggle -->
     <button class="btn btn-outline-secondary btn-sm d-none d-lg-inline-flex" id="btnSidebarToggle" type="button" title="Collapse sidebar">
-      ≡
+      <i class="bi bi-layout-sidebar-inset"></i>
     </button>
 
     <div class="flex-grow-1">
@@ -28,8 +28,8 @@ $BASE_URL = $GLOBALS['BASE_URL'] ?? '';
 
     <!-- Notifications -->
     <a class="btn btn-outline-secondary btn-sm position-relative" href="/modules/notifications.php" title="Notifications">
-      🔔
-      <?php if (!empty($notif_badge) && (int)$notif_badge > 0): ?>
+      <i class="bi bi-bell"></i>
+    <?php if (!empty($notif_badge) && (int)$notif_badge > 0): ?>
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
           <?= (int)$notif_badge ?>
         </span>
@@ -43,7 +43,9 @@ $BASE_URL = $GLOBALS['BASE_URL'] ?? '';
     data-bs-toggle="dropdown"
     aria-expanded="false"
   >
-    <span class="avatar-mini"></span>
+    <div class="avatar-mini d-flex align-items-center justify-content-center bg-primary text-white">
+      <i class="bi bi-person"></i>
+    </div>
     <span class="d-none d-md-inline">
       <?= htmlspecialchars($current_user_name ?? 'User') ?>
     </span>

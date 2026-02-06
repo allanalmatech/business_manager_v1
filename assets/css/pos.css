@@ -451,3 +451,208 @@
 #searchResults .list-group-item:last-child {
   border-bottom: none;
 }
+
+/* POS Machine Interface Enhancements */
+
+/* Fullscreen Mode */
+body.pos-fullscreen .app-sidebar,
+body.pos-fullscreen .app-topbar {
+  display: none !important;
+}
+
+body.pos-fullscreen .app-content {
+  margin-left: 0 !important;
+  padding: 0 !important;
+}
+
+body.pos-fullscreen .pos-shell {
+  height: 100vh;
+  min-height: 100vh;
+  padding: 0;
+  gap: 0;
+}
+
+body.pos-fullscreen .pos-left,
+body.pos-fullscreen .pos-right {
+  border-radius: 0;
+  border: none;
+  height: 100vh;
+}
+
+body.pos-fullscreen .pos-right {
+  border-left: 1px solid rgba(0,0,0,.1);
+}
+
+/* Touch-Optimized Grid */
+.pos-grid.touch-grid {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 15px;
+  padding: 15px;
+}
+
+.pos-quick-tile.touch-tile {
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.pos-quick-tile.touch-tile .pos-quick-thumb {
+  margin-bottom: 0;
+  border-radius: 0;
+  height: 140px;
+}
+
+.pos-quick-tile.touch-tile .pos-quick-info {
+  padding: 10px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pos-quick-tile.touch-tile .pos-quick-name {
+  font-size: 14px;
+  height: auto;
+  margin-bottom: 5px;
+}
+
+.pos-quick-tile.touch-tile .pos-quick-price {
+  font-size: 16px;
+  color: #0d6efd;
+  margin-top: 0;
+}
+
+/* Quantity Controls in Cart */
+.pos-qty-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(0,0,0,.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.pos-qty-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.pos-qty-btn:active {
+  background: #e2e8f0;
+}
+
+.pos-qty-input {
+  width: 40px;
+  height: 32px;
+  text-align: center;
+  border: none;
+  border-left: 1px solid rgba(0,0,0,.1);
+  border-right: 1px solid rgba(0,0,0,.1);
+  font-weight: bold;
+}
+
+/* Quick Payment Buttons */
+.payment-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn-shortcut {
+  padding: 10px 5px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+/* Numpad Styling */
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 15px;
+  background: #f1f5f9;
+  border-radius: 15px;
+}
+
+.numpad-btn {
+  height: 60px;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.numpad-btn:active {
+  background: #e2e8f0;
+}
+
+.numpad-btn.action {
+  background: #0d6efd;
+  color: #fff;
+}
+
+/* Category Tabs */
+.pos-tabs-modern {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 10px;
+  background: #fff;
+  scrollbar-width: none;
+}
+
+.pos-tabs-modern::-webkit-scrollbar {
+  display: none;
+}
+
+.pos-tab-modern {
+  flex: 0 0 auto;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  border: none;
+  font-weight: 600;
+  color: #64748b;
+  transition: all 0.2s;
+}
+
+.pos-tab-modern.active {
+  background: #0d6efd;
+  color: #fff;
+}
+
+/* Header Adjustments */
+.pos-header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.fullscreen-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: none;
+  cursor: pointer;
+}

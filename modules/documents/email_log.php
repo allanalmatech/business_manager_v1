@@ -105,8 +105,6 @@ h("CREATE TABLE email_log (
 ?></pre>
           </div>
           <?php
-          require_once __DIR__ . '/../../templates/layout/footer.php';
-          exit;
         }
 
         // Columns (support multiple schema versions)
@@ -395,6 +393,9 @@ h("CREATE TABLE email_log (
         </div>
       </div>
 
+    <?php endif; ?>
+
+      </div>
     </main>
   </div>
 </div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 25, 2026 at 12:06 PM
+-- Generation Time: Feb 06, 2026 at 10:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,25 @@ SET time_zone = "+00:00";
 --
 -- Database: `business_manager`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `approvals`
+--
+
+CREATE TABLE `approvals` (
+  `id` bigint(20) NOT NULL,
+  `approval_type` varchar(80) NOT NULL,
+  `reference_table` varchar(80) DEFAULT NULL,
+  `reference_id` varchar(80) DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'pending',
+  `requested_by` int(11) DEFAULT NULL,
+  `approved_by` int(11) DEFAULT NULL,
+  `notes` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -141,7 +160,154 @@ INSERT INTO `audit_logs` (`id`, `user_id`, `action`, `entity`, `entity_id`, `det
 (95, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0', '2026-01-25 09:48:03'),
 (96, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0', '2026-01-25 09:58:07'),
 (97, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0', '2026-01-25 10:07:01'),
-(98, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0', '2026-01-25 10:30:48');
+(98, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0', '2026-01-25 10:30:48'),
+(99, 1, 'auth.login_success', 'user', '1', 'Login successful', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-25 11:51:42'),
+(100, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-01-25 12:53:11'),
+(101, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-01-25 14:55:13'),
+(102, 1, 'products.stock_in', 'product', '1', 'Stock in: 10 units', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-01-25 14:55:42'),
+(103, 1, 'products.stock_in', 'product', '1', 'Stock in: 2 units', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-01-25 14:58:39'),
+(104, 1, 'products.stock_in', 'product', '1', 'Stock in: 10 units', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-01-25 15:03:34'),
+(105, 1, 'products.stock_in', 'product', '1', 'Stock in: 3 units', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-01-25 15:04:16'),
+(106, 1, 'products.stock_in', 'product', '1', 'Stock in: 10 units', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-01-25 15:05:00'),
+(107, 1, 'products.stock_in', 'product', '1', 'Stock in: 1 units', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-01-25 15:07:05'),
+(108, 1, 'products.stock_in', 'product', '1', 'Stock in: 0.5 units', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-01-25 15:07:33'),
+(109, 1, 'products.stock_in', 'product', '1', 'Stock in: 0.5 units', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-01-25 15:07:55'),
+(110, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-01-31 16:33:24'),
+(111, NULL, 'auth.login_failed', 'user', 'admin@almatechconsults.com', 'Invalid credentials', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-01 11:57:10'),
+(112, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-01 12:15:13'),
+(113, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-02 07:23:47'),
+(114, NULL, 'auth.login_failed', 'user', 'admin@almatechconsults.com', 'Invalid credentials', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-03 08:10:11'),
+(115, NULL, 'auth.login_failed', 'user', 'admin@almatechconsults.com', 'Invalid credentials', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-03 08:10:13'),
+(116, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-03 08:10:16'),
+(117, 1, 'products.stock_in', 'product', '1', 'Stock in: 2 units', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-03 13:16:11'),
+(118, 1, 'products.stock_in', 'product', '1', 'Stock in: 2 units', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-03 13:17:47'),
+(119, 1, 'products.stock_in', 'product', '1', 'Stock in: 50 units', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-03 13:18:14'),
+(120, 1, 'stock.transfer', 'product', '1', 'Transfer #58 from 1 to 2 qty 10', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-03 13:26:43'),
+(121, 1, 'stock.transfer', 'product', '1', 'Transfer #59 from 2 to 1 qty 1', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-03 13:27:27'),
+(122, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-04 11:19:28'),
+(123, 1, 'auth.login_success', 'user', '1', 'Login successful', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', '2026-02-04 14:55:35');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bank_accounts`
+--
+
+CREATE TABLE `bank_accounts` (
+  `id` bigint(20) NOT NULL,
+  `account_name` varchar(100) NOT NULL,
+  `account_number` varchar(50) NOT NULL,
+  `bank_name` varchar(100) NOT NULL,
+  `branch` varchar(100) DEFAULT NULL,
+  `account_type` enum('current','savings','fixed_deposit','business') NOT NULL DEFAULT 'current',
+  `currency` varchar(3) NOT NULL DEFAULT 'USD',
+  `opening_balance` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `current_balance` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `notes` text DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `created_by` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bank_accounts`
+--
+
+INSERT INTO `bank_accounts` (`id`, `account_name`, `account_number`, `bank_name`, `branch`, `account_type`, `currency`, `opening_balance`, `current_balance`, `is_active`, `notes`, `created_at`, `updated_at`, `created_by`) VALUES
+(1, 'Main Business Account', '1234567890', 'First National Bank', 'Main Branch', 'current', 'USD', 10000.00, 10000.00, 1, NULL, '2026-02-03 14:00:00', '2026-02-03 14:00:00', 1),
+(2, 'Petty Cash Account', '9876543210', 'First National Bank', 'Main Branch', 'current', 'USD', 1000.00, 1000.00, 1, NULL, '2026-02-03 14:00:00', '2026-02-03 14:00:00', 1),
+(3, 'Savings Account', '5555666677', 'First National Bank', 'Main Branch', 'savings', 'USD', 5000.00, 5000.00, 1, NULL, '2026-02-03 14:00:00', '2026-02-03 14:00:00', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bank_transactions`
+--
+
+CREATE TABLE `bank_transactions` (
+  `id` bigint(20) NOT NULL,
+  `account_id` bigint(20) NOT NULL,
+  `transaction_date` date NOT NULL,
+  `type` enum('debit','credit') NOT NULL,
+  `amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `reference` varchar(100) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `category` varchar(50) DEFAULT NULL,
+  `reconciled` tinyint(1) NOT NULL DEFAULT 0,
+  `reconciliation_date` datetime DEFAULT NULL,
+  `attachment_path` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `created_by` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bank_transactions`
+--
+
+INSERT INTO `bank_transactions` (`id`, `account_id`, `transaction_date`, `type`, `amount`, `reference`, `description`, `category`, `reconciled`, `reconciliation_date`, `attachment_path`, `created_at`, `updated_at`, `created_by`) VALUES
+(1, 1, '2026-01-27', 'credit', 5000.00, 'DEP001', 'Customer Deposit - Invoice #1001', 'deposit', 0, NULL, NULL, '2026-02-03 14:00:00', '2026-02-03 14:00:00', 1),
+(2, 1, '2026-01-29', 'debit', 1500.00, 'PAY001', 'Supplier Payment - Office Supplies', 'expense', 0, NULL, NULL, '2026-02-03 14:00:00', '2026-02-03 14:00:00', 1),
+(3, 2, '2026-01-31', 'debit', 500.00, 'PETTY001', 'Petty Cash Withdrawal', 'transfer', 0, NULL, NULL, '2026-02-03 14:00:00', '2026-02-03 14:00:00', 1),
+(4, 1, '2026-02-02', 'credit', 2500.00, 'DEP002', 'Customer Deposit - Invoice #1002', 'deposit', 0, NULL, NULL, '2026-02-03 14:00:00', '2026-02-03 14:00:00', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contact_categories`
+--
+
+CREATE TABLE `contact_categories` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `color` varchar(7) DEFAULT '#007bff',
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contact_category_map`
+--
+
+CREATE TABLE `contact_category_map` (
+  `id` int(11) NOT NULL,
+  `contact_id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contact_tags`
+--
+
+CREATE TABLE `contact_tags` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `color` varchar(7) DEFAULT '#28a745',
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contact_tag_map`
+--
+
+CREATE TABLE `contact_tag_map` (
+  `id` int(11) NOT NULL,
+  `contact_id` int(11) NOT NULL,
+  `tag_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -174,6 +340,64 @@ CREATE TABLE `doc_sequences` (
   `prefix` varchar(10) NOT NULL,
   `current_no` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `email_log`
+--
+
+CREATE TABLE `email_log` (
+  `id` int(11) NOT NULL,
+  `to_email` varchar(190) NOT NULL,
+  `to_name` varchar(190) DEFAULT NULL,
+  `subject` varchar(255) NOT NULL,
+  `body` mediumtext DEFAULT NULL,
+  `status` varchar(30) NOT NULL DEFAULT 'queued',
+  `provider` varchar(50) DEFAULT NULL,
+  `error_message` text DEFAULT NULL,
+  `meta_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`meta_json`)),
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `sent_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `finance`
+--
+
+CREATE TABLE `finance` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `type` enum('IN','OUT') NOT NULL,
+  `amount` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `method` varchar(100) DEFAULT NULL,
+  `reference` varchar(150) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `installments`
+--
+
+CREATE TABLE `installments` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `contact_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `reference` varchar(100) DEFAULT NULL,
+  `amount_due` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `amount_paid` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `due_date` date DEFAULT NULL,
+  `status` varchar(32) NOT NULL DEFAULT 'active',
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -264,6 +488,52 @@ CREATE TABLE `price_adjustments` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `procurement_shopping_list`
+--
+
+CREATE TABLE `procurement_shopping_list` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `quantity` decimal(10,2) NOT NULL,
+  `unit` varchar(50) NOT NULL,
+  `estimated_cost` decimal(12,2) DEFAULT 0.00,
+  `actual_cost` decimal(12,2) DEFAULT NULL,
+  `status` enum('pending','ordered','received','cancelled') DEFAULT 'pending',
+  `priority` enum('low','medium','high') DEFAULT 'medium',
+  `supplier_id` int(11) DEFAULT NULL,
+  `ordered_date` datetime DEFAULT NULL,
+  `received_date` datetime DEFAULT NULL,
+  `user_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `procurement_wanted_items`
+--
+
+CREATE TABLE `procurement_wanted_items` (
+  `id` int(11) NOT NULL,
+  `item_name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `category` varchar(100) DEFAULT NULL,
+  `estimated_cost` decimal(12,2) DEFAULT 0.00,
+  `status` enum('pending','approved','rejected','ordered') DEFAULT 'pending',
+  `priority` enum('low','medium','high') DEFAULT 'medium',
+  `reason` text DEFAULT NULL,
+  `requested_by` int(11) NOT NULL,
+  `approved_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `products`
 --
 
@@ -320,7 +590,51 @@ CREATE TABLE `product_categories` (
 --
 
 INSERT INTO `product_categories` (`id`, `name`, `description`, `is_active`, `created_at`) VALUES
-(1, 'Ceramic Cup', NULL, 1, '2026-01-23 10:17:37');
+(1, 'Ceramic Cup', NULL, 1, '2026-01-23 10:17:37'),
+(2, 'Plate', 'Plates', 1, '2026-02-03 13:01:15');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reminders`
+--
+
+CREATE TABLE `reminders` (
+  `id` bigint(20) NOT NULL,
+  `title` varchar(150) NOT NULL,
+  `remind_at` datetime NOT NULL,
+  `channel` varchar(20) NOT NULL DEFAULT 'email',
+  `target` varchar(150) DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'pending',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `return_items`
+--
+
+CREATE TABLE `return_items` (
+  `id` bigint(20) NOT NULL,
+  `return_id` bigint(20) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `location_id` int(11) NOT NULL,
+  `quantity` decimal(12,3) NOT NULL DEFAULT 0.000,
+  `unit_price` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `total` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `return_items`
+--
+
+INSERT INTO `return_items` (`id`, `return_id`, `product_id`, `location_id`, `quantity`, `unit_price`, `total`, `status`, `created_at`) VALUES
+(3, 3, 1, 0, 1.000, 3000.00, 3000.00, 'pending', '2026-02-02 19:35:25'),
+(4, 4, 1, 1, 1.000, 3000.00, 3000.00, 'pending', '2026-02-02 20:10:02');
 
 -- --------------------------------------------------------
 
@@ -425,6 +739,27 @@ CREATE TABLE `sales` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `sales`
+--
+
+INSERT INTO `sales` (`id`, `doc_type`, `doc_no`, `selling_location_id`, `customer_id`, `pricing_mode`, `status`, `payment_status`, `currency`, `subtotal`, `discount_total`, `tax_total`, `grand_total`, `amount_paid`, `balance`, `notes`, `created_by`, `created_at`) VALUES
+(34, 'receipt', 'RC-20260202-121847-16', 1, NULL, 'retail', 'confirmed', 'paid', 'UGX', 3000.00, 0.00, 0.00, 3000.00, 5000.00, 0.00, '', 1, '2026-02-02 14:18:47'),
+(35, 'receipt', 'RC-20260202-122803-88', 1, NULL, 'retail', 'confirmed', 'unpaid', 'UGX', 3000.00, 0.00, 0.00, 3000.00, 0.00, 3000.00, '', 1, '2026-02-02 14:28:03'),
+(36, 'receipt', 'RC-20260202-123610-65', 1, NULL, 'retail', 'confirmed', 'unpaid', 'UGX', 3000.00, 0.00, 0.00, 3000.00, 0.00, 3000.00, '', 1, '2026-02-02 14:36:10'),
+(37, 'receipt', 'RC-20260202-124218-85', 1, NULL, 'retail', 'confirmed', 'paid', 'UGX', 3000.00, 0.00, 0.00, 3000.00, 4000.00, 0.00, '', 1, '2026-02-02 14:42:18'),
+(38, 'receipt', 'RC-20260202-124401-78', 1, NULL, 'retail', 'confirmed', 'unpaid', 'UGX', 6000.00, 0.00, 0.00, 6000.00, 0.00, 6000.00, '', 1, '2026-02-02 14:44:01'),
+(39, 'receipt', 'RC-20260202-125049-71', 1, NULL, 'retail', 'confirmed', 'paid', 'UGX', 3000.00, 0.00, 0.00, 3000.00, 8000.00, 0.00, '', 1, '2026-02-02 14:50:49'),
+(40, 'receipt', 'RC-20260202-130329-86', 1, NULL, 'retail', 'confirmed', 'unpaid', 'UGX', 3000.00, 0.00, 0.00, 3000.00, 0.00, 3000.00, '', 1, '2026-02-02 15:03:29'),
+(41, 'receipt', 'RC-20260202-130757-62', 1, NULL, 'retail', 'confirmed', 'unpaid', 'UGX', 3000.00, 0.00, 0.00, 3000.00, 0.00, 3000.00, '', 1, '2026-02-02 15:07:57'),
+(42, 'receipt', 'RC-20260202-131427-43', 1, NULL, 'retail', 'confirmed', 'unpaid', 'UGX', 3000.00, 0.00, 0.00, 3000.00, 0.00, 3000.00, '', 1, '2026-02-02 15:14:27'),
+(43, 'receipt', 'RC-20260202-131605-62', 1, NULL, 'retail', 'confirmed', 'unpaid', 'UGX', 3000.00, 0.00, 0.00, 3000.00, 0.00, 3000.00, '', 1, '2026-02-02 15:16:05'),
+(44, 'receipt', 'RC-20260202-131725-40', 1, NULL, 'retail', 'confirmed', 'unpaid', 'UGX', 3000.00, 0.00, 0.00, 3000.00, 0.00, 3000.00, '', 1, '2026-02-02 15:17:25'),
+(45, 'receipt', 'RC-20260203-142021-17', 2, NULL, 'retail', 'confirmed', 'unpaid', 'UGX', 15000.00, 0.00, 0.00, 15000.00, 0.00, 15000.00, '', 1, '2026-02-03 16:20:21'),
+(46, 'receipt', 'RC-20260203-142146-40', 2, NULL, 'retail', 'confirmed', 'paid', 'UGX', 6000.00, 0.00, 0.00, 6000.00, 10000.00, 0.00, '', 1, '2026-02-03 16:21:46'),
+(47, 'receipt', 'RC-20260203-142429-99', 2, NULL, 'retail', 'confirmed', 'paid', 'UGX', 21000.00, 0.00, 0.00, 21000.00, 25000.00, 0.00, '', 1, '2026-02-03 16:24:29'),
+(48, 'receipt', 'RC-20260203-142516-10', 1, NULL, 'retail', 'confirmed', 'paid', 'UGX', 24000.00, 0.00, 0.00, 24000.00, 30000.00, 0.00, '', 1, '2026-02-03 16:25:16');
+
 -- --------------------------------------------------------
 
 --
@@ -451,6 +786,27 @@ CREATE TABLE `sale_items` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `sale_items`
+--
+
+INSERT INTO `sale_items` (`id`, `sale_id`, `product_id`, `is_external`, `sku_snapshot`, `name_snapshot`, `unit_type_snapshot`, `pieces_per_box_snapshot`, `qty_input`, `qty_base`, `price_mode_snapshot`, `unit_price`, `discount_amount`, `line_total`, `external_cost`, `external_source`, `created_at`) VALUES
+(32, 34, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 1, 'retail', 3000.00, 0.00, 3000.00, NULL, NULL, '2026-02-02 14:18:48'),
+(33, 35, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 1, 'retail', 3000.00, 0.00, 3000.00, NULL, NULL, '2026-02-02 14:28:03'),
+(34, 36, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 1, 'retail', 3000.00, 0.00, 3000.00, NULL, NULL, '2026-02-02 14:36:10'),
+(35, 37, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 1, 'retail', 3000.00, 0.00, 3000.00, NULL, NULL, '2026-02-02 14:42:18'),
+(36, 38, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 2, 'retail', 3000.00, 0.00, 6000.00, NULL, NULL, '2026-02-02 14:44:01'),
+(37, 39, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 1, 'retail', 3000.00, 0.00, 3000.00, NULL, NULL, '2026-02-02 14:50:49'),
+(38, 40, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 1, 'retail', 3000.00, 0.00, 3000.00, NULL, NULL, '2026-02-02 15:03:29'),
+(39, 41, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 1, 'retail', 3000.00, 0.00, 3000.00, NULL, NULL, '2026-02-02 15:07:57'),
+(40, 42, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 1, 'retail', 3000.00, 0.00, 3000.00, NULL, NULL, '2026-02-02 15:14:27'),
+(41, 43, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 1, 'retail', 3000.00, 0.00, 3000.00, NULL, NULL, '2026-02-02 15:16:05'),
+(42, 44, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 1, 'retail', 3000.00, 0.00, 3000.00, NULL, NULL, '2026-02-02 15:17:25'),
+(43, 45, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 5, 'retail', 3000.00, 0.00, 15000.00, NULL, NULL, '2026-02-03 16:20:22'),
+(44, 46, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 2, 'retail', 3000.00, 0.00, 6000.00, NULL, NULL, '2026-02-03 16:21:46'),
+(45, 47, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 7, 'retail', 3000.00, 0.00, 21000.00, NULL, NULL, '2026-02-03 16:24:29'),
+(46, 48, 1, 0, '12132', 'Round Cup', NULL, NULL, 0.000, 8, 'retail', 3000.00, 0.00, 24000.00, NULL, NULL, '2026-02-03 16:25:16');
+
 -- --------------------------------------------------------
 
 --
@@ -467,6 +823,46 @@ CREATE TABLE `sale_payments` (
   `received_by` bigint(20) NOT NULL,
   `received_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sale_payments`
+--
+
+INSERT INTO `sale_payments` (`id`, `sale_id`, `method`, `provider`, `amount`, `reference`, `received_by`, `received_at`) VALUES
+(7, 34, 'cash', '', 5000.00, '', 1, '2026-02-02 14:18:48'),
+(8, 37, 'cash', '', 4000.00, '', 1, '2026-02-02 14:42:18'),
+(9, 39, 'cash', '', 8000.00, '', 1, '2026-02-02 14:50:49'),
+(10, 46, 'cash', '', 10000.00, '', 1, '2026-02-03 16:21:46'),
+(11, 47, 'cash', '', 25000.00, '', 1, '2026-02-03 16:24:29'),
+(12, 48, 'cash', '', 30000.00, '', 1, '2026-02-03 16:25:16');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sale_returns`
+--
+
+CREATE TABLE `sale_returns` (
+  `id` bigint(20) NOT NULL,
+  `sale_id` bigint(20) NOT NULL,
+  `return_no` varchar(50) NOT NULL,
+  `reason` text NOT NULL,
+  `refund_amount` decimal(12,2) DEFAULT 0.00,
+  `status` enum('pending','approved','completed','rejected','cancelled') NOT NULL DEFAULT 'pending',
+  `selling_location_id` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) NOT NULL,
+  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `refunded` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sale_returns`
+--
+
+INSERT INTO `sale_returns` (`id`, `sale_id`, `return_no`, `reason`, `refund_amount`, `status`, `selling_location_id`, `created_at`, `created_by`, `updated_at`, `refunded`) VALUES
+(3, 42, 'RET-2026-000042-ea90', 'Not taken', 2000.00, 'pending', 3, '2026-02-02 17:37:34', 1, '2026-02-02 19:37:34', 1),
+(4, 35, 'RET-2026-000035-356d', 'brought back', 3000.00, 'completed', 1, '2026-02-02 00:00:00', 1, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -490,12 +886,76 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `data`, `ip_address`, `user_agent`, `last_activity`, `created_at`, `updated_at`) VALUES
-('0puer8u6fe1jjalqm69o4a5a32', 1, 0x637372667c733a36343a2231646332643265306564663961313737383864306261653862383330343130376538383931623864393933666438623461343961616532366137663732373365223b757365727c613a353a7b733a323a226964223b693a313b733a373a22726f6c655f6964223b693a313b733a343a22726f6c65223b733a31313a2273757065725f61646d696e223b733a383a22757365726e616d65223b733a353a2261646d696e223b733a343a226e616d65223b733a31313a2253757065722041646d696e223b7d, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0', 1769337034, '2026-01-25 10:07:01', '2026-01-25 10:30:34'),
-('8i9u41eqgjje2u13riom69t3da', 1, 0x637372667c733a36343a2234383365616530623737653539646161303862653566393765363465656531666537353565383364336130646238333162626439313966363366656232373535223b757365727c613a353a7b733a323a226964223b693a313b733a373a22726f6c655f6964223b693a313b733a343a22726f6c65223b733a31313a2273757065725f61646d696e223b733a383a22757365726e616d65223b733a353a2261646d696e223b733a343a226e616d65223b733a31313a2253757065722041646d696e223b7d, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0', 1769335040, '2026-01-25 09:48:03', '2026-01-25 09:57:20'),
-('cn60n9seomg3711mqno86hm0cl', 1, 0x637372667c733a36343a2238633934373732396565363436353230663631623634306538363939333134636535353666346463343434373162633830613634303932653637373338643335223b757365727c613a353a7b733a323a226964223b693a313b733a373a22726f6c655f6964223b693a313b733a343a22726f6c65223b733a31313a2273757065725f61646d696e223b733a383a22757365726e616d65223b733a353a2261646d696e223b733a343a226e616d65223b733a31313a2253757065722041646d696e223b7d, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0', 1769335608, '2026-01-25 09:58:07', '2026-01-25 10:06:48'),
-('e0eugo972rgno1kvrq27b02elr', NULL, 0x637372667c733a36343a2230343033616137303066613263386634366564316161633834336231623834666363396164343530393634346434663364383738386230643864613736363232223b, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0', 1769335349, '2026-01-25 10:02:29', NULL),
-('ngo3afi0hl5tq2381ghjc35bmh', NULL, 0x637372667c733a36343a2239383035623439383666633134303832623062646136376661623435626363343830373830666236306531616431313233613636343966323637313538373033223b, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0', 1769335349, '2026-01-25 10:02:29', NULL),
-('uacs1vcvmsb4fkvn21qh1arb23', 1, 0x637372667c733a36343a2264663366636564346234346437613462313666316133383863626662323636306163623732326538623963613563616164393164656361326637663634613339223b757365727c613a353a7b733a323a226964223b693a313b733a373a22726f6c655f6964223b693a313b733a343a22726f6c65223b733a31313a2273757065725f61646d696e223b733a383a22757365726e616d65223b733a353a2261646d696e223b733a343a226e616d65223b733a31313a2253757065722041646d696e223b7d, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0', 1769339136, '2026-01-25 10:30:48', '2026-01-25 11:05:36');
+('ide0khi6tle4ud9lr00u6vgrbm', 1, 0x637372667c733a36343a2262383630323662396361623531646164316361646332333533333861333133623965336632336462303738666636383238653035383664376238613231383639223b757365727c613a353a7b733a323a226964223b693a313b733a373a22726f6c655f6964223b693a313b733a343a22726f6c65223b733a31313a2273757065725f61646d696e223b733a383a22757365726e616d65223b733a353a2261646d696e223b733a343a226e616d65223b733a31313a2253757065722041646d696e223b7d, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0', 1770228523, '2026-02-04 14:55:35', '2026-02-04 18:08:43');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `settings`
+--
+
+CREATE TABLE `settings` (
+  `id` int(11) NOT NULL,
+  `key` varchar(100) NOT NULL,
+  `value` text DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `settings`
+--
+
+INSERT INTO `settings` (`id`, `key`, `value`, `description`, `created_at`, `updated_at`) VALUES
+(1, 'business_name', 'Business Manager POS', 'Business name for receipts and invoices', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(2, 'business_address', '123 Main Street\nKampala, Uganda\nPhone: +256 123 456 789', 'Business address for receipts', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(3, 'business_phone', '+256 123 456 789', 'Business phone number', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(4, 'business_email', 'info@businessmanager.com', 'Business email address', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(5, 'receipt_header', 'THANK YOU FOR SHOPPING WITH US\nPlease come again!', 'Header text for receipts', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(6, 'receipt_footer', 'Thank you for your purchase!\nAll sales are final\nNo returns without receipt\nVisit us again soon!', 'Footer text for receipts', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(7, 'business_logo', '', 'Business logo URL or path', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(8, 'business_website', 'www.businessmanager.com', 'Business website', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(9, 'business_tax_id', 'UG-123456789', 'Business tax identification number', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(10, 'currency_symbol', 'UGX', 'Currency symbol for display', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(11, 'currency_code', 'UGX', 'Currency code (ISO)', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(12, 'decimal_places', '0', 'Number of decimal places for currency', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(13, 'thousands_separator', ',', 'Thousands separator for numbers', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(14, 'decimal_point', '.', 'Decimal point for numbers', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(15, 'receipt_width', '80', 'Receipt width in mm for thermal printers', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(16, 'cash_drawer_port', 'COM1', 'Cash drawer port (if applicable)', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(17, 'printer_name', 'Default Printer', 'Default receipt printer name', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(18, 'auto_print_receipt', '1', 'Auto print receipt after sale (1=on, 0=off)', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(19, 'auto_open_drawer', '1', 'Auto open cash drawer after sale (1=on, 0=off)', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(20, 'show_customer_copy', '1', 'Show customer copy option (1=on, 0=off)', '2026-02-02 11:29:48', '2026-02-02 11:29:48'),
+(21, 'show_cashier_copy', '1', 'Show cashier copy option (1=on, 0=off)', '2026-02-02 11:29:48', '2026-02-02 11:29:48');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `staff`
+--
+
+CREATE TABLE `staff` (
+  `id` int(11) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `last_name` varchar(100) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `employee_id` varchar(50) DEFAULT NULL,
+  `role` varchar(100) DEFAULT NULL,
+  `department` varchar(100) DEFAULT NULL,
+  `date_of_birth` date DEFAULT NULL,
+  `hire_date` date DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `state` varchar(100) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL,
+  `status` enum('active','inactive','on_leave','terminated') DEFAULT 'active',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -515,8 +975,8 @@ CREATE TABLE `stock_by_location` (
 --
 
 INSERT INTO `stock_by_location` (`product_id`, `location_id`, `qty_base`, `low_level_base`) VALUES
-(1, 1, 10.00, 5.00),
-(1, 2, 7.00, 5.00);
+(1, 1, 1.00, 5.00),
+(1, 2, 49.00, 5.00);
 
 -- --------------------------------------------------------
 
@@ -547,7 +1007,101 @@ CREATE TABLE `stock_movements` (
 INSERT INTO `stock_movements` (`id`, `product_id`, `from_location_id`, `to_location_id`, `movement_type`, `qty_change`, `qty_before`, `qty_after`, `reference_type`, `reference_id`, `note`, `created_by`, `created_at`) VALUES
 (1, 1, 2, 1, 'transfer', -5.00, 10.00, 5.00, 'transfer', NULL, '', 1, '2026-01-23 12:56:54'),
 (2, 1, 1, 2, 'transfer', -4.00, 10.00, 6.00, 'transfer', NULL, '', 1, '2026-01-23 13:28:47'),
-(3, 1, 2, 2, 'adjustment', -2.00, 9.00, 7.00, 'adjustment', NULL, '', 1, '2026-01-23 13:34:46');
+(3, 1, 2, 2, 'adjustment', -2.00, 9.00, 7.00, 'adjustment', NULL, '', 1, '2026-01-23 13:34:46'),
+(5, 1, 2, NULL, 'sale', -1.00, 7.00, 6.00, 'receipt', '2', 'POS RC-2026-13560176', 1, '2026-01-25 10:56:01'),
+(6, 1, 2, NULL, 'sale', -1.00, 6.00, 5.00, 'receipt', '3', 'POS RC-2026-13573862', 1, '2026-01-25 10:57:38'),
+(7, 1, 2, NULL, 'sale', -1.00, 5.00, 4.00, 'receipt', '4', 'POS RC-2026-14002542', 1, '2026-01-25 11:00:25'),
+(8, 1, 2, NULL, 'sale', -1.00, 4.00, 3.00, 'receipt', '5', 'POS RC-2026-14022312', 1, '2026-01-25 11:02:23'),
+(9, 1, 2, NULL, 'sale', -1.00, 3.00, 2.00, 'receipt', '6', 'POS RC-2026-14273148', 1, '2026-01-25 11:27:31'),
+(10, 1, 2, NULL, 'sale', -1.00, 2.00, 1.00, 'receipt', '7', 'POS RC-2026-14284940', 1, '2026-01-25 11:28:49'),
+(11, 1, 2, NULL, 'sale', -1.00, 1.00, 0.00, 'receipt', '8', 'POS RC-2026-14285799', 1, '2026-01-25 11:28:57'),
+(12, 1, 2, NULL, 'sale', -1.00, 0.00, -1.00, 'receipt', '9', 'POS RC-2026-14311048', 1, '2026-01-25 11:31:10'),
+(13, 1, 2, NULL, 'sale', -1.00, -1.00, -2.00, 'receipt', '10', 'POS RC-2026-14410642', 1, '2026-01-25 11:41:06'),
+(14, 1, 2, NULL, 'sale', -1.00, -2.00, -3.00, 'receipt', '11', 'POS RC-2026-14430126', 1, '2026-01-25 11:43:01'),
+(15, 1, 2, NULL, 'sale', -1.00, -3.00, -4.00, 'receipt', '12', 'POS RC-2026-14431772', 1, '2026-01-25 11:43:17'),
+(16, 1, 2, NULL, 'sale', -1.00, -4.00, -5.00, 'receipt', '13', 'POS RC-2026-14521198', 1, '2026-01-25 11:52:11'),
+(17, 1, 1, 1, 'stock_in', 10.00, 10.00, 20.00, 'stock_in', NULL, '', 1, '2026-01-25 14:55:42'),
+(18, 1, 1, 1, 'stock_in', 2.00, 20.00, 22.00, 'stock_in', NULL, '', 1, '2026-01-25 14:58:39'),
+(19, 1, 1, 1, 'stock_in', 10.00, 22.00, 32.00, 'stock_in', NULL, '', 1, '2026-01-25 15:03:34'),
+(20, 1, 1, 1, 'stock_in', 3.00, 32.00, 35.00, 'stock_in', NULL, '', 1, '2026-01-25 15:04:16'),
+(21, 1, 2, 2, 'stock_in', 10.00, -5.00, 5.00, 'stock_in', NULL, '', 1, '2026-01-25 15:05:00'),
+(22, 1, 2, 2, 'stock_in', 1.00, 5.00, 6.00, 'stock_in', NULL, '', 1, '2026-01-25 15:07:05'),
+(23, 1, 2, 2, 'stock_in', 0.50, 6.00, 6.50, 'stock_in', NULL, '', 1, '2026-01-25 15:07:33'),
+(24, 1, 2, 2, 'stock_in', 0.50, 6.50, 7.00, 'stock_in', NULL, '', 1, '2026-01-25 15:07:55'),
+(25, 1, 2, 2, 'sale', -1.00, 0.00, 0.00, 'receipt', '19', 'RC-20260202-082550-89', 1, '2026-02-02 07:25:50'),
+(26, 1, 2, 2, 'sale', -1.00, 0.00, 0.00, 'receipt', '20', 'RC-20260202-082649-25', 1, '2026-02-02 07:26:49'),
+(27, 1, 2, 2, 'sale', -1.00, 0.00, 0.00, 'receipt', '21', 'RC-20260202-082716-39', 1, '2026-02-02 07:27:16'),
+(29, 1, 2, 2, 'sale', -1.00, 0.00, 0.00, 'receipt', '23', 'RC-20260202-095436-39', 1, '2026-02-02 08:54:36'),
+(31, 1, 2, 2, 'sale', -1.00, 0.00, 0.00, 'receipt', '25', 'RC-20260202-100153-71', 1, '2026-02-02 09:01:53'),
+(32, 1, 2, 2, 'sale', -1.00, 0.00, 0.00, 'receipt', '26', 'RC-20260202-100204-98', 1, '2026-02-02 09:02:04'),
+(33, 1, 2, 2, 'sale', -1.00, 0.00, 0.00, 'receipt', '27', 'RC-20260202-101330-61', 1, '2026-02-02 09:13:30'),
+(34, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '28', 'RC-20260202-102356-12', 1, '2026-02-02 09:23:56'),
+(35, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '29', 'RC-20260202-103552-18', 1, '2026-02-02 09:35:52'),
+(36, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '30', 'RC-20260202-104626-59', 1, '2026-02-02 09:46:26'),
+(37, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '31', 'RC-20260202-110428-31', 1, '2026-02-02 10:04:28'),
+(38, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '32', 'RC-20260202-120958-26', 1, '2026-02-02 11:09:58'),
+(39, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '33', 'RC-20260202-121507-48', 1, '2026-02-02 11:15:07'),
+(40, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '34', 'RC-20260202-121847-16', 1, '2026-02-02 11:18:48'),
+(41, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '35', 'RC-20260202-122803-88', 1, '2026-02-02 11:28:03'),
+(42, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '36', 'RC-20260202-123610-65', 1, '2026-02-02 11:36:10'),
+(43, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '37', 'RC-20260202-124218-85', 1, '2026-02-02 11:42:18'),
+(44, 1, 1, 1, 'sale', -2.00, 0.00, 0.00, 'receipt', '38', 'RC-20260202-124401-78', 1, '2026-02-02 11:44:01'),
+(45, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '39', 'RC-20260202-125049-71', 1, '2026-02-02 11:50:49'),
+(46, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '40', 'RC-20260202-130329-86', 1, '2026-02-02 12:03:29'),
+(47, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '41', 'RC-20260202-130757-62', 1, '2026-02-02 12:07:57'),
+(48, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '42', 'RC-20260202-131427-43', 1, '2026-02-02 12:14:27'),
+(49, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '43', 'RC-20260202-131605-62', 1, '2026-02-02 12:16:05'),
+(50, 1, 1, 1, 'sale', -1.00, 0.00, 0.00, 'receipt', '44', 'RC-20260202-131725-40', 1, '2026-02-02 12:17:25'),
+(51, 1, 2, 2, 'stock_in', 2.00, 0.00, 2.00, 'stock_in', NULL, '', 1, '2026-02-03 13:16:11'),
+(52, 1, 2, 2, 'stock_in', 2.00, 2.00, 4.00, 'stock_in', NULL, '', 1, '2026-02-03 13:17:47'),
+(53, 1, 2, 2, 'stock_in', 50.00, 4.00, 54.00, 'stock_in', NULL, '', 1, '2026-02-03 13:18:14'),
+(54, 1, 2, 2, 'sale', -5.00, 0.00, 0.00, 'receipt', '45', 'RC-20260203-142021-17', 1, '2026-02-03 13:20:22'),
+(55, 1, 2, 2, 'sale', -2.00, 0.00, 0.00, 'receipt', '46', 'RC-20260203-142146-40', 1, '2026-02-03 13:21:46'),
+(56, 1, 2, 2, 'sale', -7.00, 0.00, 0.00, 'receipt', '47', 'RC-20260203-142429-99', 1, '2026-02-03 13:24:29'),
+(57, 1, 1, 1, 'sale', -8.00, 0.00, 0.00, 'receipt', '48', 'RC-20260203-142516-10', 1, '2026-02-03 13:25:16'),
+(58, 1, 1, 2, 'transfer', -10.00, 10.00, 0.00, 'transfer', NULL, '', 1, '2026-02-03 13:26:43'),
+(59, 1, 2, 1, 'transfer', -1.00, 50.00, 49.00, 'transfer', NULL, 'stocking', 1, '2026-02-03 13:27:27');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `suppliers`
+--
+
+CREATE TABLE `suppliers` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `company_name` varchar(255) DEFAULT NULL,
+  `contact_person` varchar(255) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `state` varchar(100) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL,
+  `category` varchar(100) DEFAULT NULL,
+  `payment_terms` varchar(255) DEFAULT NULL,
+  `status` enum('active','inactive','suspended') DEFAULT 'active',
+  `preferred` tinyint(1) DEFAULT 0,
+  `rating` decimal(3,1) DEFAULT 0.0 CHECK (`rating` >= 0 and `rating` <= 5),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `update_history`
+--
+
+CREATE TABLE `update_history` (
+  `id` bigint(20) NOT NULL,
+  `version_from` varchar(40) DEFAULT NULL,
+  `version_to` varchar(40) DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'success',
+  `notes` longtext DEFAULT NULL,
+  `applied_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -576,7 +1130,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `role_id`, `username`, `email`, `phone`, `full_name`, `password_hash`, `profile_photo`, `is_active`, `must_change_password`, `last_login_at`, `created_at`, `updated_at`) VALUES
-(1, 1, 'admin', 'admin@example.com', '0700000000', 'Super Admin', '$2y$10$EyS5WjBZlS40zfB2DAOYAujg5kYZZb3THDaDTpeO3NIv2GrUuFSpq', NULL, 1, 0, '2026-01-25 13:30:48', '2026-01-23 07:14:23', '2026-01-25 10:30:48'),
+(1, 1, 'admin', 'admin@example.com', '0700000000', 'Super Admin', '$2y$10$EyS5WjBZlS40zfB2DAOYAujg5kYZZb3THDaDTpeO3NIv2GrUuFSpq', NULL, 1, 0, '2026-02-04 17:55:35', '2026-01-23 07:14:23', '2026-02-04 14:55:35'),
 (2, 2, 'cashier1', 'cashier1@example.com', '0700000001', 'Cashier One', '$2y$10$Xm/oXjAxX/0WtjiUgsez7u.3NoQmawiJnaMlLInfHFaAci1ibDhvy', NULL, 1, 0, '2026-01-23 10:19:45', '2026-01-23 07:14:23', '2026-01-23 07:19:45'),
 (3, 3, 'accountant1', 'accountant1@example.com', '0700000002', 'Accountant One', '$2y$10$Jyd2w5riEHltBwSLHT.Gu.78JZ6SpFFNb84gqCiSKFX/RVKLIke2q', NULL, 1, 0, '2026-01-23 10:20:41', '2026-01-23 07:14:23', '2026-01-23 07:20:41');
 
@@ -592,9 +1146,39 @@ CREATE TABLE `user_permissions` (
   `is_allowed` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `vouchers`
+--
+
+CREATE TABLE `vouchers` (
+  `id` int(11) NOT NULL,
+  `voucher_no` varchar(30) NOT NULL,
+  `voucher_date` datetime NOT NULL,
+  `payee` varchar(150) NOT NULL,
+  `amount` decimal(12,2) NOT NULL,
+  `description` text DEFAULT NULL,
+  `status` enum('draft','pending','approved','rejected','paid') DEFAULT 'draft',
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `paid_at` datetime DEFAULT NULL,
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `approvals`
+--
+ALTER TABLE `approvals`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_type` (`approval_type`);
 
 --
 -- Indexes for table `audit_logs`
@@ -603,6 +1187,64 @@ ALTER TABLE `audit_logs`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_audit_user_id` (`user_id`),
   ADD KEY `idx_audit_action` (`action`);
+
+--
+-- Indexes for table `bank_accounts`
+--
+ALTER TABLE `bank_accounts`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_account_number` (`account_number`),
+  ADD KEY `idx_bank_name` (`bank_name`),
+  ADD KEY `idx_is_active` (`is_active`);
+
+--
+-- Indexes for table `bank_transactions`
+--
+ALTER TABLE `bank_transactions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_account_id` (`account_id`),
+  ADD KEY `idx_transaction_date` (`transaction_date`),
+  ADD KEY `idx_type` (`type`),
+  ADD KEY `idx_reconciled` (`reconciled`),
+  ADD KEY `idx_created_at` (`created_at`);
+
+--
+-- Indexes for table `contact_categories`
+--
+ALTER TABLE `contact_categories`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`),
+  ADD KEY `idx_name` (`name`),
+  ADD KEY `idx_is_active` (`is_active`),
+  ADD KEY `idx_created_at` (`created_at`);
+
+--
+-- Indexes for table `contact_category_map`
+--
+ALTER TABLE `contact_category_map`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_contact_category` (`contact_id`,`category_id`),
+  ADD KEY `idx_contact_id` (`contact_id`),
+  ADD KEY `idx_category_id` (`category_id`);
+
+--
+-- Indexes for table `contact_tags`
+--
+ALTER TABLE `contact_tags`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`),
+  ADD KEY `idx_name` (`name`),
+  ADD KEY `idx_is_active` (`is_active`),
+  ADD KEY `idx_created_at` (`created_at`);
+
+--
+-- Indexes for table `contact_tag_map`
+--
+ALTER TABLE `contact_tag_map`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_contact_tag` (`contact_id`,`tag_id`),
+  ADD KEY `idx_contact_id` (`contact_id`),
+  ADD KEY `idx_tag_id` (`tag_id`);
 
 --
 -- Indexes for table `customers`
@@ -618,6 +1260,35 @@ ALTER TABLE `customers`
 ALTER TABLE `doc_sequences`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uq_doc_type_year` (`doc_type`,`year`);
+
+--
+-- Indexes for table `email_log`
+--
+ALTER TABLE `email_log`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_created_at` (`created_at`),
+  ADD KEY `idx_to_email` (`to_email`),
+  ADD KEY `idx_sent_at` (`sent_at`);
+
+--
+-- Indexes for table `finance`
+--
+ALTER TABLE `finance`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_finance_user_id` (`user_id`),
+  ADD KEY `idx_finance_type` (`type`),
+  ADD KEY `idx_finance_created_at` (`created_at`);
+
+--
+-- Indexes for table `installments`
+--
+ALTER TABLE `installments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_installments_contact_id` (`contact_id`),
+  ADD KEY `idx_installments_status` (`status`),
+  ADD KEY `idx_installments_due_date` (`due_date`),
+  ADD KEY `fk_installments_user` (`user_id`);
 
 --
 -- Indexes for table `locations`
@@ -642,6 +1313,31 @@ ALTER TABLE `price_adjustments`
   ADD KEY `fk_pa_user` (`changed_by`);
 
 --
+-- Indexes for table `procurement_shopping_list`
+--
+ALTER TABLE `procurement_shopping_list`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_priority` (`priority`),
+  ADD KEY `idx_product_name` (`product_name`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_created_at` (`created_at`),
+  ADD KEY `product_id` (`product_id`),
+  ADD KEY `supplier_id` (`supplier_id`);
+
+--
+-- Indexes for table `procurement_wanted_items`
+--
+ALTER TABLE `procurement_wanted_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_priority` (`priority`),
+  ADD KEY `idx_item_name` (`item_name`),
+  ADD KEY `idx_requested_by` (`requested_by`),
+  ADD KEY `idx_approved_by` (`approved_by`),
+  ADD KEY `idx_created_at` (`created_at`);
+
+--
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -656,6 +1352,24 @@ ALTER TABLE `products`
 ALTER TABLE `product_categories`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `reminders`
+--
+ALTER TABLE `reminders`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_remind_at` (`remind_at`),
+  ADD KEY `idx_status` (`status`);
+
+--
+-- Indexes for table `return_items`
+--
+ALTER TABLE `return_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `return_id` (`return_id`),
+  ADD KEY `product_id` (`product_id`),
+  ADD KEY `idx_location_id` (`location_id`),
+  ADD KEY `idx_item_status` (`status`);
 
 --
 -- Indexes for table `roles`
@@ -696,12 +1410,50 @@ ALTER TABLE `sale_payments`
   ADD KEY `idx_sale_payments_sale` (`sale_id`);
 
 --
+-- Indexes for table `sale_returns`
+--
+ALTER TABLE `sale_returns`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `return_no` (`return_no`),
+  ADD KEY `sale_id` (`sale_id`),
+  ADD KEY `status` (`status`),
+  ADD KEY `created_at` (`created_at`),
+  ADD KEY `fk_sale_returns_user` (`created_by`);
+
+--
 -- Indexes for table `sessions`
 --
 ALTER TABLE `sessions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_sessions_last_activity` (`last_activity`),
   ADD KEY `idx_sessions_user_id` (`user_id`);
+
+--
+-- Indexes for table `settings`
+--
+ALTER TABLE `settings`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_key` (`key`),
+  ADD KEY `idx_settings_key` (`key`),
+  ADD KEY `idx_settings_updated` (`updated_at`);
+
+--
+-- Indexes for table `staff`
+--
+ALTER TABLE `staff`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `employee_id` (`employee_id`),
+  ADD KEY `idx_first_name` (`first_name`),
+  ADD KEY `idx_last_name` (`last_name`),
+  ADD KEY `idx_email` (`email`),
+  ADD KEY `idx_employee_id` (`employee_id`),
+  ADD KEY `idx_role` (`role`),
+  ADD KEY `idx_department` (`department`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_hire_date` (`hire_date`),
+  ADD KEY `idx_created_at` (`created_at`),
+  ADD KEY `idx_is_active` (`is_active`);
 
 --
 -- Indexes for table `stock_by_location`
@@ -722,6 +1474,27 @@ ALTER TABLE `stock_movements`
   ADD KEY `fk_sm_to_loc` (`to_location_id`);
 
 --
+-- Indexes for table `suppliers`
+--
+ALTER TABLE `suppliers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `idx_name` (`name`),
+  ADD KEY `idx_email` (`email`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_category` (`category`),
+  ADD KEY `idx_preferred` (`preferred`),
+  ADD KEY `idx_rating` (`rating`),
+  ADD KEY `idx_created_at` (`created_at`);
+
+--
+-- Indexes for table `update_history`
+--
+ALTER TABLE `update_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_created_at` (`created_at`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -738,14 +1511,66 @@ ALTER TABLE `user_permissions`
   ADD KEY `fk_up_perm` (`permission_id`);
 
 --
+-- Indexes for table `vouchers`
+--
+ALTER TABLE `vouchers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `voucher_no` (`voucher_no`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_date` (`voucher_date`),
+  ADD KEY `idx_voucher_no` (`voucher_no`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `approvals`
+--
+ALTER TABLE `approvals`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=99;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
+
+--
+-- AUTO_INCREMENT for table `bank_accounts`
+--
+ALTER TABLE `bank_accounts`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `bank_transactions`
+--
+ALTER TABLE `bank_transactions`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `contact_categories`
+--
+ALTER TABLE `contact_categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `contact_category_map`
+--
+ALTER TABLE `contact_category_map`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `contact_tags`
+--
+ALTER TABLE `contact_tags`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `contact_tag_map`
+--
+ALTER TABLE `contact_tag_map`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `customers`
@@ -758,6 +1583,24 @@ ALTER TABLE `customers`
 --
 ALTER TABLE `doc_sequences`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `email_log`
+--
+ALTER TABLE `email_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `finance`
+--
+ALTER TABLE `finance`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `installments`
+--
+ALTER TABLE `installments`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `locations`
@@ -778,6 +1621,18 @@ ALTER TABLE `price_adjustments`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `procurement_shopping_list`
+--
+ALTER TABLE `procurement_shopping_list`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `procurement_wanted_items`
+--
+ALTER TABLE `procurement_wanted_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
@@ -787,7 +1642,19 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `product_categories`
 --
 ALTER TABLE `product_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `reminders`
+--
+ALTER TABLE `reminders`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `return_items`
+--
+ALTER TABLE `return_items`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -799,31 +1666,67 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `sales`
 --
 ALTER TABLE `sales`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `sale_items`
 --
 ALTER TABLE `sale_items`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `sale_payments`
 --
 ALTER TABLE `sale_payments`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `sale_returns`
+--
+ALTER TABLE `sale_returns`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `settings`
+--
+ALTER TABLE `settings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `staff`
+--
+ALTER TABLE `staff`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `stock_movements`
 --
 ALTER TABLE `stock_movements`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+
+--
+-- AUTO_INCREMENT for table `suppliers`
+--
+ALTER TABLE `suppliers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `update_history`
+--
+ALTER TABLE `update_history`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `vouchers`
+--
+ALTER TABLE `vouchers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -836,6 +1739,37 @@ ALTER TABLE `audit_logs`
   ADD CONSTRAINT `fk_audit_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
+-- Constraints for table `bank_transactions`
+--
+ALTER TABLE `bank_transactions`
+  ADD CONSTRAINT `fk_bank_transactions_account` FOREIGN KEY (`account_id`) REFERENCES `bank_accounts` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `contact_category_map`
+--
+ALTER TABLE `contact_category_map`
+  ADD CONSTRAINT `contact_category_map_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `contact_categories` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `contact_tag_map`
+--
+ALTER TABLE `contact_tag_map`
+  ADD CONSTRAINT `contact_tag_map_ibfk_1` FOREIGN KEY (`tag_id`) REFERENCES `contact_tags` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `finance`
+--
+ALTER TABLE `finance`
+  ADD CONSTRAINT `fk_finance_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `installments`
+--
+ALTER TABLE `installments`
+  ADD CONSTRAINT `fk_installments_contact` FOREIGN KEY (`contact_id`) REFERENCES `customers` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_installments_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `price_adjustments`
 --
 ALTER TABLE `price_adjustments`
@@ -843,11 +1777,33 @@ ALTER TABLE `price_adjustments`
   ADD CONSTRAINT `fk_pa_user` FOREIGN KEY (`changed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
+-- Constraints for table `procurement_shopping_list`
+--
+ALTER TABLE `procurement_shopping_list`
+  ADD CONSTRAINT `procurement_shopping_list_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `procurement_shopping_list_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `procurement_shopping_list_ibfk_3` FOREIGN KEY (`supplier_id`) REFERENCES `customers` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `procurement_wanted_items`
+--
+ALTER TABLE `procurement_wanted_items`
+  ADD CONSTRAINT `procurement_wanted_items_ibfk_1` FOREIGN KEY (`requested_by`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `procurement_wanted_items_ibfk_2` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `products`
 --
 ALTER TABLE `products`
   ADD CONSTRAINT `fk_products_category` FOREIGN KEY (`category_id`) REFERENCES `product_categories` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`default_location_id`) REFERENCES `locations` (`id`);
+
+--
+-- Constraints for table `return_items`
+--
+ALTER TABLE `return_items`
+  ADD CONSTRAINT `fk_return_items_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_return_items_return` FOREIGN KEY (`return_id`) REFERENCES `sale_returns` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `role_permissions`
@@ -873,6 +1829,13 @@ ALTER TABLE `sale_items`
 --
 ALTER TABLE `sale_payments`
   ADD CONSTRAINT `fk_sale_payments_sale` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `sale_returns`
+--
+ALTER TABLE `sale_returns`
+  ADD CONSTRAINT `fk_sale_returns_sale` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_sale_returns_user` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `sessions`

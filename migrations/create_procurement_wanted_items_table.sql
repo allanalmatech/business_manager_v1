@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS procurement_wanted_items (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    item_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    estimated_cost DECIMAL(12, 2) DEFAULT 0.00,
+    status ENUM('pending', 'approved', 'rejected', 'ordered') DEFAULT 'pending',
+    priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
+    reason TEXT,
+    requested_by INT NOT NULL,
+    approved_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_status (status),
+    INDEX idx_priority (priority),
+    INDEX idx_item_name (item_name),
+    INDEX idx_requested_by (requested_by),
+    INDEX idx_approved_by (approved_by),
+    INDEX idx_created_at (created_at),
+    FOREIGN KEY (requested_by) REFERENCES users(id) ON DELETE RESTRICT,
+    FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL
+);

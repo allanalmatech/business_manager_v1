@@ -7,8 +7,6 @@
     btnToggle.addEventListener("click", () => {
       document.body.classList.toggle("sidebar-collapsed");
       localStorage.setItem("sidebarCollapsed", document.body.classList.contains("sidebar-collapsed") ? "1" : "0");
-      // Reinitialize hover functionality after toggle
-      initHoverExpansion();
     });
   }
 
@@ -22,51 +20,54 @@
   const saved = localStorage.getItem("sidebarCollapsed");
   if (saved === "1") document.body.classList.add("sidebar-collapsed");
 
-  // Initialize hover expansion functionality
-  function initHoverExpansion() {
-    // Remove existing event listeners to prevent duplicates
-    const navGroups = document.querySelectorAll('.app-sidebar .nav-link-group');
-    
-    navGroups.forEach(group => {
-      const submenu = group.querySelector('.nav-sub');
-      if (!submenu) return;
+  /**
+   * Enhanced Hover Logic for Collapsed Sidebar
+   */
+  const navGroups = document.querySelectorAll('.app-sidebar .nav-link-group');
+  
+  navGroups.forEach(group => {
+    const submenu = group.nextElementSibling; // The .nav-sub div
+    if (!submenu || !submenu.classList.contains('nav-sub')) return;
 
-      // Clone and replace to remove existing event listeners
-      const newGroup = group.cloneNode(true);
-      const newSubmenu = newGroup.querySelector('.nav-sub');
+    let hoverTimeout;
+
+    const showSubmenu = () => {
+      if (!document.body.classList.contains('sidebar-collapsed')) return;
       
-      let hoverTimeout;
+      clearTimeout(hoverTimeout);
+      
+      // Position the submenu
+      const rect = group.getBoundingClientRect();
+      submenu.style.position = 'fixed';
+      submenu.style.top = rect.top + 'px';
+      submenu.style.left = '80px';
+      submenu.style.display = 'block';
+      submenu.style.opacity = '1';
+      submenu.style.visibility = 'visible';
+      submenu.style.height = 'auto';
+      submenu.classList.add('show'); // Bootstrap class
+    };
 
-      newGroup.addEventListener('mouseenter', () => {
-        clearTimeout(hoverTimeout);
-        // Only show if sidebar is collapsed
-        if (document.body.classList.contains('sidebar-collapsed')) {
-          newSubmenu.style.display = 'block';
-        }
-      });
+    const hideSubmenu = () => {
+      if (!document.body.classList.contains('sidebar-collapsed')) return;
+      
+      hoverTimeout = setTimeout(() => {
+        submenu.style.display = '';
+        submenu.style.position = '';
+        submenu.style.top = '';
+        submenu.style.left = '';
+        submenu.style.opacity = '';
+        submenu.style.visibility = '';
+        submenu.classList.remove('show');
+      }, 100);
+    };
 
-      newGroup.addEventListener('mouseleave', () => {
-        // Hide with a small delay to allow moving to submenu
-        hoverTimeout = setTimeout(() => {
-          newSubmenu.style.display = 'none';
-        }, 100);
-      });
-
-      newSubmenu.addEventListener('mouseenter', () => {
-        clearTimeout(hoverTimeout);
-      });
-
-      newSubmenu.addEventListener('mouseleave', () => {
-        newSubmenu.style.display = 'none';
-      });
-
-      // Replace the original element
-      group.parentNode.replaceChild(newGroup, group);
-    });
-  }
-
-  // Initialize on page load
-  initHoverExpansion();
+    group.addEventListener('mouseenter', showSubmenu);
+    group.addEventListener('mouseleave', hideSubmenu);
+    
+    submenu.addEventListener('mouseenter', () => clearTimeout(hoverTimeout));
+    submenu.addEventListener('mouseleave', hideSubmenu);
+  });
 
   // Close on overlay click (mobile)
   document.addEventListener("click", (e) => {
@@ -83,17 +84,15 @@
   const currentPath = window.location.pathname.replace(/\/+$/, '');
   const sidebarLinks = document.querySelectorAll('#appSidebar a.nav-link, #appSidebar a.nav-sublink');
   let activeLink = null;
-  let activeCollapse = null;
 
   for (const a of sidebarLinks) {
     let href = a.getAttribute('href') || '';
-    // Resolve to absolute path
     if (href.startsWith('/')) {
       href = href.replace(/\/+$/, '');
     } else {
-      // Relative: prepend current path base up to project root
-      const base = window.location.origin;
-      href = new URL(href, window.location.href).pathname.replace(/\/+$/, '');
+      try {
+        href = new URL(href, window.location.href).pathname.replace(/\/+$/, '');
+      } catch(e) {}
     }
     if (href && currentPath === href) {
       activeLink = a;
@@ -103,19 +102,21 @@
 
   if (activeLink) {
     activeLink.classList.add('active');
-    // If it’s a sublink, expand its parent collapse
     const parentCollapse = activeLink.closest('.collapse.nav-sub');
-    if (parentCollapse) {
-      activeCollapse = parentCollapse;
-      // Ensure Bootstrap collapse is shown
+    if (parentCollapse && !document.body.classList.contains('sidebar-collapsed')) {
       const bsCollapse = new bootstrap.Collapse(parentCollapse, { toggle: false });
       bsCollapse.show();
-      // Also update the button’s aria-expanded
       const btn = document.querySelector(`[data-bs-target="#${parentCollapse.id}"]`);
       if (btn) btn.setAttribute('aria-expanded', 'true');
     }
   }
 
-  // ===== Hover expansion for collapsed sidebar =====
-  // This is now handled by the initHoverExpansion function above
+  // Initialize tooltips for collapsed state
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl, {
+      customClass: 'sidebar-tooltip',
+      trigger: 'hover'
+    });
+  });
 })();

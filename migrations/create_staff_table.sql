@@ -1,0 +1,30 @@
+-- Create staff table
+CREATE TABLE IF NOT EXISTS staff (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phone VARCHAR(20),
+    employee_id VARCHAR(50) UNIQUE,
+    role VARCHAR(100),
+    department VARCHAR(100),
+    date_of_birth DATE,
+    hire_date DATE,
+    address VARCHAR(255),
+    city VARCHAR(100),
+    state VARCHAR(100),
+    country VARCHAR(100),
+    status ENUM('active', 'inactive', 'on_leave', 'terminated') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_first_name (first_name),
+    INDEX idx_last_name (last_name),
+    INDEX idx_email (email),
+    INDEX idx_employee_id (employee_id),
+    INDEX idx_role (role),
+    INDEX idx_department (department),
+    INDEX idx_status (status),
+    INDEX idx_hire_date (hire_date),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

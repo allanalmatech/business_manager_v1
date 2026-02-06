@@ -23,7 +23,7 @@ $page = max(1, (int)($_GET['page'] ?? 1));
 $perPage = 50;
 $offset = ($page - 1) * $perPage;
 
-// Check if customers table exists
+// Check if contacts table exists for customer info
 $hasCustomers = false;
 $res = $db->query("SHOW TABLES LIKE 'contacts'");
 if ($res && $res->num_rows > 0) {
@@ -121,22 +121,11 @@ $totals = [
 $st->close();
 
 if ($export) {
-    // Stream CSV of the full filtered set
-    $csvSql = "SELECT s.id, s.doc_no, s.created_at, s.grand_total, s.status, s.payment_status $customerSelect
-        FROM sales s
-        $customerJoin
-        $whereSql
-        ORDER BY s.created_at DESC";
-    $st = $db->prepare($csvSql);
-    if ($types !== '') $st->bind_param($types, ...$params);
-    $st->execute();
-    $res = $st->get_result();
-
     header('Content-Type: text/csv');
     header('Content-Disposition: attachment; filename="sales_report.csv"');
     $out = fopen('php://output', 'w');
     fputcsv($out, ['Sale ID', 'Doc No', 'Date', 'Customer', 'Amount', 'Status', 'Payment Status']);
-    while ($r = $res->fetch_assoc()) {
+    foreach ($rows as $r) {
         fputcsv($out, [
             $r['id'],
             $r['doc_no'],
@@ -159,248 +148,166 @@ require_once __DIR__ . '/../../templates/layout/header.php';
     <?php require_once __DIR__ . '/../../templates/layout/topbar.php'; ?>
 
     <main class="page-wrap">
-      <div class="container-fluid py-3">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h4 class="mb-1"><?= h($page_title) ?></h4>
-            <div class="text-muted small"><?= h($page_subtitle) ?></div>
-          </div>
-          <div>
-            <a class="btn btn-outline-primary" href="?<?= h(http_build_query(array_merge($_GET, ['export'=>'csv']))) ?>">
-              <i class="bi bi-download"></i> Export CSV
-            </a>
-          </div>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h4 class="fw-bold mb-0"><?= h($page_title) ?></h4>
+          <div class="text-muted small"><?= h($page_subtitle) ?></div>
         </div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-outline-primary shadow-sm" href="?<?= h(http_build_query(array_merge($_GET, ['export'=>'csv']))) ?>">
+            <i class="bi bi-download me-1"></i> Export CSV
+          </a>
+        </div>
+      </div>
 
-        <!-- Summary Cards -->
-        <div class="row mb-4">
-          <div class="col-md-4 mb-3">
-            <div class="card border-0 bg-success bg-opacity-10">
-              <div class="card-body text-center">
-                <div class="fs-2 fw-bold text-success"><?= h((string)$totals['count']) ?></div>
-                <div class="small text-muted">Total Sales</div>
+      <!-- Stats Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-success bg-opacity-10 text-success p-3 rounded-4 me-3">
+                <i class="bi bi-cart-check fs-3"></i>
               </div>
-            </div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <div class="card border-0 bg-primary bg-opacity-10">
-              <div class="card-body text-center">
-                <div class="fs-2 fw-bold text-primary"><?= h(number_format($totals['revenue'], 2)) ?></div>
-                <div class="small text-muted">Total Revenue</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <div class="card border-0 bg-info bg-opacity-10">
-              <div class="card-body text-center">
-                <div class="fs-2 fw-bold text-info"><?= h(number_format($totals['revenue'] / max(1, $totals['count']), 2)) ?></div>
-                <div class="small text-muted">Average Sale</div>
+              <div>
+                <div class="text-muted small fw-bold text-uppercase">Total Sales</div>
+                <div class="fs-3 fw-bold"><?= h((string)$totals['count']) ?></div>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- Report Filters -->
-        <div class="card shadow-sm mb-4">
-          <div class="card-header bg-light">
-            <h6 class="mb-0"><i class="bi bi-funnel"></i> Report Filters</h6>
-          </div>
-          <div class="card-body">
-            <form method="get" class="row g-3">
-              <div class="col-md-3">
-                <label class="form-label small text-muted">Search</label>
-                <input type="text" name="q" value="<?= h($q) ?>" class="form-control" placeholder="Search document number...">
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-4 me-3">
+                <i class="bi bi-currency-dollar fs-3"></i>
               </div>
-              <div class="col-md-2">
-                <label class="form-label small text-muted">From Date</label>
-                <input type="date" name="from" value="<?= h($from) ?>" class="form-control">
+              <div>
+                <div class="text-muted small fw-bold text-uppercase">Total Revenue</div>
+                <div class="fs-3 fw-bold"><?= h(number_format($totals['revenue'], 2)) ?></div>
               </div>
-              <div class="col-md-2">
-                <label class="form-label small text-muted">To Date</label>
-                <input type="date" name="to" value="<?= h($to) ?>" class="form-control">
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small text-muted">Status</label>
-                <select name="status" class="form-select">
-                  <option value="">All statuses</option>
-                  <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option>
-                  <option value="confirmed" <?= $status === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
-                  <option value="voided" <?= $status === 'voided' ? 'selected' : '' ?>>Voided</option>
-                </select>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small text-muted">Location</label>
-                <select name="location" class="form-select">
-                  <option value="">All locations</option>
-                  <?php
-                  $locs = $db->query("SELECT id, name FROM locations ORDER BY name ASC");
-                  if ($locs) {
-                      while ($l = $locs->fetch_assoc()): ?>
-                    <option value="<?= (int)$l['id'] ?>" <?= $location === (string)$l['id'] ? 'selected' : '' ?>><?= h($l['name']) ?></option>
-                    <?php endwhile;
-                  }
-                  ?>
-                </select>
-              </div>
-              <div class="col-md-1">
-                <label class="form-label small text-muted">&nbsp;</label>
-                <button type="submit" class="btn btn-primary w-100">
-                  <i class="bi bi-search"></i> Filter
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        <!-- Sales Report Table -->
-        <div class="card shadow-sm">
-          <div class="card-header bg-light d-flex justify-content-between align-items-center">
-            <h6 class="mb-0"><i class="bi bi-cart-check"></i> Sales Transactions</h6>
-            <div class="small text-muted">
-              Showing <strong><?= count($rows) ?></strong> records
             </div>
           </div>
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-sm table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th width="15%">Sale Document</th>
-                    <th width="15%">Date</th>
-                    <th width="20%">Customer</th>
-                    <th width="20%" class="text-end">Amount</th>
-                    <th width="10%">Status</th>
-                    <th width="10%">Payment</th>
-                    <th width="10%">Viewed</th>
-                  </tr>
-                </thead>
-                <tbody>
+        </div>
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-info bg-opacity-10 text-info p-3 rounded-4 me-3">
+                <i class="bi bi-graph-up fs-3"></i>
+              </div>
+              <div>
+                <div class="text-muted small fw-bold text-uppercase">Average Ticket</div>
+                <div class="fs-3 fw-bold"><?= h(number_format($totals['revenue'] / max(1, $totals['count']), 2)) ?></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+          <form method="get" class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Search</label>
+              <input type="text" name="q" value="<?= h($q) ?>" class="form-control" placeholder="Doc number...">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small fw-bold">From</label>
+              <input type="date" name="from" value="<?= h($from) ?>" class="form-control">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small fw-bold">To</label>
+              <input type="date" name="to" value="<?= h($to) ?>" class="form-control">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small fw-bold">Status</label>
+              <select name="status" class="form-select">
+                <option value="">All Status</option>
+                <option value="confirmed" <?= $status === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
+                <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option>
+                <option value="voided" <?= $status === 'voided' ? 'selected' : '' ?>>Voided</option>
+              </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-filter me-1"></i> Apply Filters
+              </button>
+              <a href="?" class="btn btn-link text-muted ms-2">Clear</a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="ps-4">Document</th>
+                  <th>Date & Time</th>
+                  <th>Customer</th>
+                  <th class="text-end">Total Amount</th>
+                  <th class="text-center">Status</th>
+                  <th class="text-center">Payment</th>
+                  <th class="text-end pe-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
                 <?php if (!$rows): ?>
                   <tr>
-                    <td colspan="7" class="text-center text-muted py-5">
-                      <div class="mb-3">
-                        <i class="bi bi-cart-x" style="font-size: 3rem;"></i>
-                      </div>
-                      <div class="fw-semibold">No sales data found</div>
-                      <div class="small">Try adjusting your search criteria or date range</div>
+                    <td colspan="7" class="text-center p-5 text-muted">
+                      <i class="bi bi-search fs-1 d-block mb-3 opacity-25"></i>
+                      No sales found matching your criteria.
                     </td>
                   </tr>
                 <?php else: foreach ($rows as $r): ?>
                   <tr>
+                    <td class="ps-4 fw-bold text-primary">
+                      <i class="bi bi-receipt me-1"></i> <?= h($r['doc_no']) ?>
+                    </td>
                     <td>
-                      <a href="<?= $GLOBALS['BASE_URL'] ?>/modules/pos/sale_view.php?id=<?= (int)$r['id'] ?>" class="text-decoration-none" target="_blank" onclick="markAsViewed(<?= (int)$r['id'] ?>)">
-                        <i class="bi bi-receipt"></i> <?= h($r['doc_no']) ?>
+                      <div class="small fw-semibold"><?= date('M d, Y', strtotime($r['created_at'])) ?></div>
+                      <div class="x-small text-muted"><?= date('H:i', strtotime($r['created_at'])) ?></div>
+                    </td>
+                    <td>
+                      <div class="fw-semibold"><?= h($r['customer_name'] ?? 'Walk-in Customer') ?></div>
+                    </td>
+                    <td class="text-end fw-bold">
+                      <?= h(number_format((float)$r['grand_total'], 2)) ?>
+                    </td>
+                    <td class="text-center">
+                      <?php
+                      $s = strtolower((string)$r['status']);
+                      $badge = 'bg-secondary';
+                      if ($s === 'confirmed') $badge = 'bg-success';
+                      if ($s === 'voided') $badge = 'bg-danger';
+                      ?>
+                      <span class="badge <?= $badge ?> rounded-pill px-3"><?= ucfirst($s) ?></span>
+                    </td>
+                    <td class="text-center">
+                      <?php
+                      $ps = strtolower((string)$r['payment_status']);
+                      $pbadge = 'bg-warning text-dark';
+                      if ($ps === 'paid') $pbadge = 'bg-success';
+                      if ($ps === 'partial') $pbadge = 'bg-info';
+                      ?>
+                      <span class="badge <?= $pbadge ?> rounded-pill px-3"><?= ucfirst($ps) ?></span>
+                    </td>
+                    <td class="text-end pe-4">
+                      <a href="<?= $GLOBALS['BASE_URL'] ?>/modules/pos/sale_view.php?id=<?= (int)$r['id'] ?>" class="btn btn-sm btn-outline-secondary" target="_blank">
+                        <i class="bi bi-eye"></i> View
                       </a>
-                    </td>
-                    <td>
-                      <small class="text-muted">
-                        <?= date('M j, Y H:i', strtotime($r['created_at'])) ?>
-                      </small>
-                    </td>
-                    <td>
-                      <span class="text-muted">
-                        <i class="bi bi-person"></i> <?= h($r['customer_name'] ?? 'Walk-in') ?>
-                      </span>
-                    </td>
-                    <td class="text-end">
-                      <span class="text-primary fw-semibold">
-                        <?= h(number_format((float)$r['grand_total'], 2)) ?>
-                      </span>
-                    </td>
-                    <td>
-                      <span class="badge bg-<?= $r['status'] === 'voided' ? 'danger' : ($r['status'] === 'draft' ? 'warning' : 'success') ?>">
-                        <?= h(ucfirst($r['status'])) ?>
-                      </span>
-                    </td>
-                    <td>
-                      <span class="badge bg-<?= $r['payment_status'] === 'unpaid' ? 'danger' : ($r['payment_status'] === 'partial' ? 'warning' : 'success') ?>">
-                        <?= h(ucfirst($r['payment_status'])) ?>
-                      </span>
-                    </td>
-                    <td>
-                      <span id="viewed-<?= (int)$r['id'] ?>" class="badge bg-secondary">
-                        <i class="bi bi-eye-slash"></i> New
-                      </span>
                     </td>
                   </tr>
                 <?php endforeach; endif; ?>
-                </tbody>
-              </table>
-            </div>
+              </tbody>
+            </table>
           </div>
         </div>
-
-        <!-- Pagination -->
-        <?php if ($total > $perPage): ?>
-        <div class="d-flex justify-content-between align-items-center mt-3">
-          <div class="text-muted small">
-            Showing <?= (($page - 1) * $perPage) + 1 ?> to <?= min($page * $perPage, $total) ?> of <?= $total ?> entries
-          </div>
-          <nav aria-label="Sales pagination">
-            <ul class="pagination mb-0">
-              <?php 
-              $lastPage = max(1, (int)ceil($total / $perPage));
-              $prevPage = max(1, $page - 1);
-              $nextPage = min($lastPage, $page + 1);
-              ?>
-              
-              <li class="page-item <?= $page === 1 ? 'disabled' : '' ?>">
-                <a class="page-link" href="?<?= h(http_build_query(array_merge($_GET, ['page' => $prevPage]))) ?>">
-                  <i class="bi bi-chevron-left"></i>
-                </a>
-              </li>
-              
-              <?php 
-              $startPage = max(1, $page - 2);
-              $endPage = min($lastPage, $page + 2);
-              
-              for ($p = $startPage; $p <= $endPage; $p++): ?>
-                <li class="page-item <?= $p === $page ? 'active' : '' ?>">
-                  <a class="page-link" href="?<?= h(http_build_query(array_merge($_GET, ['page' => $p]))) ?>"><?= $p ?></a>
-                </li>
-              <?php endfor; ?>
-              
-              <li class="page-item <?= $page === $lastPage ? 'disabled' : '' ?>">
-                <a class="page-link" href="?<?= h(http_build_query(array_merge($_GET, ['page' => $nextPage]))) ?>">
-                  <i class="bi bi-chevron-right"></i>
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-        <?php endif; ?>
-
       </div>
     </main>
   </div>
 </div>
-
-<script>
-function markAsViewed(saleId) {
-  // Update the badge to show viewed status
-  const badge = document.getElementById('viewed-' + saleId);
-  if (badge) {
-    badge.className = 'badge bg-success';
-    badge.innerHTML = '<i class="bi bi-eye"></i> Viewed';
-  }
-  
-  // Store view status in localStorage (optional: could also send to server)
-  const viewedSales = JSON.parse(localStorage.getItem('viewedSales') || '{}');
-  viewedSales[saleId] = new Date().toISOString();
-  localStorage.setItem('viewedSales', JSON.stringify(viewedSales));
-}
-
-// Check for previously viewed sales on page load
-document.addEventListener('DOMContentLoaded', function() {
-  const viewedSales = JSON.parse(localStorage.getItem('viewedSales') || '{}');
-  Object.keys(viewedSales).forEach(saleId => {
-    const badge = document.getElementById('viewed-' + saleId);
-    if (badge) {
-      badge.className = 'badge bg-success';
-      badge.innerHTML = '<i class="bi bi-eye"></i> Viewed';
-    }
-  });
-});
-</script>
-
-<?php require_once __DIR__ . '/../../templates/layout/footer.php';
+<?php require_once __DIR__ . '/../../templates/layout/footer.php'; ?>
